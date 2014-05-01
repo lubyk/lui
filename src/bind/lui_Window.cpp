@@ -11,8 +11,8 @@
 
 using namespace lui;
 
-/** lui::Window::Window(int window_flags=0)
- * include/lui/Window.h:54
+/** lui::Window::Window(int window_flags=Default)
+ * include/lui/Window.h:55
  */
 static int Window_Window(lua_State *L) {
   try {
@@ -36,7 +36,7 @@ static int Window_Window(lua_State *L) {
 }
 
 /** lui::Window::~Window()
- * include/lui/Window.h:56
+ * include/lui/Window.h:57
  */
 static int Window__Window(lua_State *L) {
   try {
@@ -51,6 +51,41 @@ static int Window__Window(lua_State *L) {
     lua_pushfstring(L, "__gc: %s", e.what());
   } catch (...) {
     lua_pushfstring(L, "__gc: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** void lui::Window::setFrame(int x, int y, int w, int h)
+ * include/lui/Window.h:59
+ */
+static int Window_setFrame(lua_State *L) {
+  try {
+    Window *self = *((Window **)dub::checksdata(L, 1, "lui.Window"));
+    int x = dub::checkint(L, 2);
+    int y = dub::checkint(L, 3);
+    int w = dub::checkint(L, 4);
+    int h = dub::checkint(L, 5);
+    self->setFrame(x, y, w, h);
+    return 0;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "setFrame: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "setFrame: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** LuaStackSize lui::Window::frame(lua_State *L)
+ * include/lui/Window.h:61
+ */
+static int Window_frame(lua_State *L) {
+  try {
+    Window *self = *((Window **)dub::checksdata(L, 1, "lui.Window"));
+    return self->frame(L);
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "frame: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "frame: Unknown exception");
   }
   return dub::error(L);
 }
@@ -70,6 +105,8 @@ static int Window___tostring(lua_State *L) {
 static const struct luaL_Reg Window_member_methods[] = {
   { "new"          , Window_Window        },
   { "__gc"         , Window__Window       },
+  { "setFrame"     , Window_setFrame      },
+  { "frame"        , Window_frame         },
   { "__tostring"   , Window___tostring    },
   { "deleted"      , dub::isDeleted       },
   { NULL, NULL},
@@ -83,6 +120,7 @@ static const struct dub::const_Reg Window_const[] = {
   { "Miniaturizable", Window::Miniaturizable },
   { "Resizable"    , Window::Resizable    },
   { "TexturedBackground", Window::TexturedBackground },
+  { "Default"      , Window::Default      },
   { NULL, 0},
 };
 

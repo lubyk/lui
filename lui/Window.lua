@@ -24,4 +24,14 @@ function lib.new(...)
   return lui.bootstrap(lib, new, ...)
 end
 
+function lib:move(x, y)
+  local _, _, w, h = self:frame()
+  self:setFrame(x, y, w, h)
+end
+
+function lib:resize(w, h)
+  local x, y, _, _ = self:frame()
+  self:setFrame(x, y, w, h)
+end
+
 return lib

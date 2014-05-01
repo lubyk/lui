@@ -176,8 +176,7 @@ class Window::Implementation {
 
 public:
   Implementation(Window *master, int flags)
-   : master_(master)
-  {
+   : master_(master) {
     NSRect frame = NSMakeRect(0, 0, 200, 200);
     win_ = [[NSWindow alloc] initWithContentRect:frame
                                         styleMask:flags
@@ -190,6 +189,21 @@ public:
   ~Implementation() {
     [win_ autorelease];
   }
+
+  inline LuaStackSize frame(lua_State *L) {
+    NSRect frame = [win_ frame];
+    lua_pushnumber(L, frame.origin.x);
+    lua_pushnumber(L, frame.origin.y);
+    lua_pushnumber(L, frame.size.width);
+    lua_pushnumber(L, frame.size.height);
+    return 4;
+  }
+
+  inline void setFrame(int x, int y, int w, int h) {
+    [win_ setFrame:NSMakeRect(x, y, w, h)
+           display:YES
+           animate:[win_ isVisible]];
+  }
 };
 
 Window::Window(int window_flags) {
@@ -198,5 +212,13 @@ Window::Window(int window_flags) {
 
 Window::~Window() {
   if (impl_) delete impl_;
+}
+
+void Window::setFrame(int x, int y, int w, int h) {
+  impl_->setFrame(x, y, w, h);
+}
+
+LuaStackSize Window::frame(lua_State *L) {
+  return impl_->frame(L);
 }
 

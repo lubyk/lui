@@ -56,6 +56,10 @@ public:
 
   ~Window();
 
+  void setFrame(int x, int y, int w, int h);
+
+  LuaStackSize frame(lua_State *L);
+
 private:
   class Implementation;
   Implementation *impl_;
