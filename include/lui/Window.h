@@ -38,6 +38,7 @@ namespace lui {
  * click, keyboard, move and resized.
  *
  * @dub push: dub_pushobject
+ *      ignore: resized, moved
  */
 class Window : public dub::Thread {
 public:
@@ -56,13 +57,44 @@ public:
 
   ~Window();
 
-  void setFrame(int x, int y, int w, int h);
+  void animateFrame(bool should_animate) {
+    animate_frame_ = should_animate;
+  }
+
+  void setFrame(double x, double y, double w, double h);
 
   LuaStackSize frame(lua_State *L);
 
+  void resized() {
+    if (!dub_pushcallback("resized")) return;
+    // <func> <self>
+    int top = lua_gettop(dub_L);
+    frame(dub_L);
+    // <func> <self> <x> <y> <w> <h>
+    lua_remove(dub_L, top);
+    lua_remove(dub_L, top);
+    // <func> <self> <w> <h>
+    dub_call(3, 0);
+  }
+
+  void moved() {
+    if (!dub_pushcallback("moved")) return;
+    // <func> <self>
+    int top = lua_gettop(dub_L);
+    frame(dub_L);
+    // <func> <self> <x> <y> <w> <h>
+    lua_remove(dub_L, top + 3);
+    lua_remove(dub_L, top + 3);
+    // <func> <self> <x> <y>
+    dub_call(3, 0);
+  }
 private:
   class Implementation;
   Implementation *impl_;
+
+  /** Whether to animate resizing and move operations.
+   */
+  bool animate_frame_;
 
 };
 

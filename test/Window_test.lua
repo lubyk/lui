@@ -48,5 +48,36 @@ function should.setAndReturnFrame()
   assertEqual(300, h)
 end
 
+function should.triggerResizedCallback()
+  local win = Window()
+  win:animateFrame(false)
+  local s = {}
+  function win:resized(w, h)
+    s.w, s.h = w, h
+  end
+  win:resize(150, 320)
+  assertEqual(150, s.w)
+  assertEqual(320, s.h)
+end
+
+function should.triggerMovedCallback()
+  local win = Window()
+  win:animateFrame(false)
+  local s = {}
+  function win:moved(x, y)
+    s.x, s.y = x, y
+  end
+  win:move(15, 32)
+  assertEqual(15, s.x)
+  assertEqual(32, s.y)
+end
+
+function should.respondToAnimateFrame()
+  local win = Window()
+  assertPass(function()
+    win:animateFrame(false)
+  end)
+end
+
 should:test()
 

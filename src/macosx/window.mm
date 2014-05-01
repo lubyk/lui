@@ -169,19 +169,47 @@ using namespace lui;
 ///   return 0;
 /// }
 
+// ============================================== LWindow (objC)
+
+@interface LWindow : NSWindow <NSWindowDelegate> {
+  Window * master_;
+}
+
+- (void)setMaster:(Window*) master;
+
+@end
+
+@implementation LWindow
+
+- (void)setMaster:(Window*) master {
+  master_ = master;
+  [self setDelegate:self];
+}
+
+- (void)windowDidResize:(NSNotification *)notification {
+  master_->resized();
+}
+
+- (void)windowDidMove:(NSNotification *)notification {
+  master_->moved();
+}
+
+@end
+
 // ============================================== Window::Implementation
 class Window::Implementation {
   Window *master_;
-  NSWindow *win_;
+  LWindow *win_;
 
 public:
   Implementation(Window *master, int flags)
    : master_(master) {
     NSRect frame = NSMakeRect(0, 0, 200, 200);
-    win_ = [[NSWindow alloc] initWithContentRect:frame
-                                        styleMask:flags
-                                          backing:NSBackingStoreBuffered
-                                            defer:NO];
+    win_ = [[LWindow alloc] initWithContentRect:frame
+                                      styleMask:flags
+                                        backing:NSBackingStoreBuffered
+                                          defer:NO];
+    [win_ setMaster:master];
     [win_ setBackgroundColor:[NSColor blueColor]];
     [win_ makeKeyAndOrderFront:NSApp];
   }
@@ -199,14 +227,15 @@ public:
     return 4;
   }
 
-  inline void setFrame(int x, int y, int w, int h) {
+  inline void setFrame(double x, double y, double w, double h) {
     [win_ setFrame:NSMakeRect(x, y, w, h)
            display:YES
-           animate:[win_ isVisible]];
+           animate:master_->animate_frame_ && [win_ isVisible]];
   }
 };
 
-Window::Window(int window_flags) {
+Window::Window(int window_flags) 
+  : animate_frame_(true) {
   impl_ = new Window::Implementation(this, window_flags);
 }
 
@@ -214,7 +243,7 @@ Window::~Window() {
   if (impl_) delete impl_;
 }
 
-void Window::setFrame(int x, int y, int w, int h) {
+void Window::setFrame(double x, double y, double w, double h) {
   impl_->setFrame(x, y, w, h);
 }
 

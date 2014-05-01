@@ -12,7 +12,7 @@
 using namespace lui;
 
 /** lui::Window::Window(int window_flags=Default)
- * include/lui/Window.h:55
+ * include/lui/Window.h:56
  */
 static int Window_Window(lua_State *L) {
   try {
@@ -36,7 +36,7 @@ static int Window_Window(lua_State *L) {
 }
 
 /** lui::Window::~Window()
- * include/lui/Window.h:57
+ * include/lui/Window.h:58
  */
 static int Window__Window(lua_State *L) {
   try {
@@ -55,16 +55,33 @@ static int Window__Window(lua_State *L) {
   return dub::error(L);
 }
 
-/** void lui::Window::setFrame(int x, int y, int w, int h)
- * include/lui/Window.h:59
+/** void lui::Window::animateFrame(bool should_animate)
+ * include/lui/Window.h:60
+ */
+static int Window_animateFrame(lua_State *L) {
+  try {
+    Window *self = *((Window **)dub::checksdata(L, 1, "lui.Window"));
+    bool should_animate = dub::checkboolean(L, 2);
+    self->animateFrame(should_animate);
+    return 0;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "animateFrame: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "animateFrame: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** void lui::Window::setFrame(double x, double y, double w, double h)
+ * include/lui/Window.h:64
  */
 static int Window_setFrame(lua_State *L) {
   try {
     Window *self = *((Window **)dub::checksdata(L, 1, "lui.Window"));
-    int x = dub::checkint(L, 2);
-    int y = dub::checkint(L, 3);
-    int w = dub::checkint(L, 4);
-    int h = dub::checkint(L, 5);
+    double x = dub::checknumber(L, 2);
+    double y = dub::checknumber(L, 3);
+    double w = dub::checknumber(L, 4);
+    double h = dub::checknumber(L, 5);
     self->setFrame(x, y, w, h);
     return 0;
   } catch (std::exception &e) {
@@ -76,7 +93,7 @@ static int Window_setFrame(lua_State *L) {
 }
 
 /** LuaStackSize lui::Window::frame(lua_State *L)
- * include/lui/Window.h:61
+ * include/lui/Window.h:66
  */
 static int Window_frame(lua_State *L) {
   try {
@@ -105,6 +122,7 @@ static int Window___tostring(lua_State *L) {
 static const struct luaL_Reg Window_member_methods[] = {
   { "new"          , Window_Window        },
   { "__gc"         , Window__Window       },
+  { "animateFrame" , Window_animateFrame  },
   { "setFrame"     , Window_setFrame      },
   { "frame"        , Window_frame         },
   { "__tostring"   , Window___tostring    },
