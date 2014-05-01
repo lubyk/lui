@@ -29,6 +29,8 @@
 #ifndef LUBYK_INCLUDE_LUI_WIDGET_H_
 #define LUBYK_INCLUDE_LUI_WIDGET_H_
 
+#include "dub/dub.h"
+
 namespace lui {
 
 /** The Window is used to display an OpenGL 3 window context.
@@ -39,11 +41,24 @@ namespace lui {
  */
 class Window : public dub::Thread {
 public:
-  Window(int window_flags = 0) {}
 
-  ~Window() {}
+  enum {
+    Borderless         = 0,
+    Titled             = 1 << 0,
+    Closable           = 1 << 1,
+    Miniaturizable     = 1 << 2,
+    Resizable          = 1 << 3,
+    TexturedBackground = 1 << 8,
+    Default            = 1 + 2 + 4 + 8,
+  };
+  
+  Window(int window_flags = Default);
 
-protected:
+  ~Window();
+
+private:
+  class Implementation;
+  Implementation *impl_;
 
 };
 

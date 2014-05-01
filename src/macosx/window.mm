@@ -1,3 +1,10 @@
+#include "lui/Window.h"
+
+#import <Cocoa/Cocoa.h>
+
+using namespace lui;
+
+
 /// #import <Cocoa/Cocoa.h>
 /// 
 /// @interface LWindow : NSWindow
@@ -161,3 +168,35 @@
 ///   [pool release];
 ///   return 0;
 /// }
+
+// ============================================== Window::Implementation
+class Window::Implementation {
+  Window *master_;
+  NSWindow *win_;
+
+public:
+  Implementation(Window *master, int flags)
+   : master_(master)
+  {
+    NSRect frame = NSMakeRect(0, 0, 200, 200);
+    win_ = [[NSWindow alloc] initWithContentRect:frame
+                                        styleMask:flags
+                                          backing:NSBackingStoreBuffered
+                                            defer:NO];
+    [win_ setBackgroundColor:[NSColor blueColor]];
+    [win_ makeKeyAndOrderFront:NSApp];
+  }
+
+  ~Implementation() {
+    [win_ autorelease];
+  }
+};
+
+Window::Window(int window_flags) {
+  impl_ = new Window::Implementation(this, window_flags);
+}
+
+Window::~Window() {
+  if (impl_) delete impl_;
+}
+

@@ -12,7 +12,7 @@
 using namespace lui;
 
 /** lui::Window::Window(int window_flags=0)
- * include/lui/Window.h:42
+ * include/lui/Window.h:54
  */
 static int Window_Window(lua_State *L) {
   try {
@@ -36,7 +36,7 @@ static int Window_Window(lua_State *L) {
 }
 
 /** lui::Window::~Window()
- * include/lui/Window.h:44
+ * include/lui/Window.h:56
  */
 static int Window__Window(lua_State *L) {
   try {
@@ -75,12 +75,24 @@ static const struct luaL_Reg Window_member_methods[] = {
   { NULL, NULL},
 };
 
+// --=============================================== CONSTANTS
+static const struct dub::const_Reg Window_const[] = {
+  { "Borderless"   , Window::Borderless   },
+  { "Titled"       , Window::Titled       },
+  { "Closable"     , Window::Closable     },
+  { "Miniaturizable", Window::Miniaturizable },
+  { "Resizable"    , Window::Resizable    },
+  { "TexturedBackground", Window::TexturedBackground },
+  { NULL, 0},
+};
 
 extern "C" int luaopen_lui_Window(lua_State *L)
 {
   // Create the metatable which will contain all the member methods
   luaL_newmetatable(L, "lui.Window");
   // <mt>
+  // register class constants
+  dub::register_const(L, Window_const);
 
   // register member methods
   dub::fregister(L, Window_member_methods);

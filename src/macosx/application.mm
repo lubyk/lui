@@ -6,7 +6,6 @@ using namespace lui;
 
 class Application::Implementation {
   Application *master_;
-  NSApplication *app_;
   NSAutoreleasePool* pool_;
 
 public:
@@ -14,7 +13,7 @@ public:
    : master_(master)
   {
     pool_ = [[NSAutoreleasePool alloc] init];
-    app_  = [[NSApplication alloc] init];
+    [NSApplication sharedApplication];
   }
 
   ~Implementation() {
@@ -22,7 +21,7 @@ public:
   }
 
   int exec() {
-    [app_ run];
+    [NSApp run];
     return 0;
   }
 };
