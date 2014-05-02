@@ -53,9 +53,13 @@ public:
     Default            = 1 + 2 + 4 + 8,
   };
   
-  Window(int window_flags = Default);
+  Window(int style = Default);
 
   ~Window();
+
+  static LuaStackSize screenSize(lua_State *L);
+
+  double titleBarHeight();
 
   void animateFrame(bool should_animate) {
     animate_frame_ = should_animate;
@@ -65,14 +69,20 @@ public:
 
   LuaStackSize frame(lua_State *L);
 
+  void show();
+
+  void hide();
+
+  // =================================== CALLBACK
+
   void resized() {
     if (!dub_pushcallback("resized")) return;
     // <func> <self>
     int top = lua_gettop(dub_L);
     frame(dub_L);
     // <func> <self> <x> <y> <w> <h>
-    lua_remove(dub_L, top);
-    lua_remove(dub_L, top);
+    lua_remove(dub_L, top + 1);
+    lua_remove(dub_L, top + 1);
     // <func> <self> <w> <h>
     dub_call(3, 0);
   }

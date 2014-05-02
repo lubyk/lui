@@ -6,6 +6,8 @@
   using an OS Timer for scheduling (timeout) and pass all file descriptors to
   the OS event loop.
 
+  WARN: This Poller does NOT WORK. It needs reimplementing with new scheduler.
+
 --]]------------------------------------------------------
 require 'lui.SocketNotifier'
 local lib    = class 'lui.Poller'

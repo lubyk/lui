@@ -22,12 +22,11 @@ lib.DEPENDS = { -- doc
   'lub >= 1.0.3, < 1.1',
 }
 
+-- nodoc
 function lib.bootstrap(class, orig, ...)
-  -- Make sure we create the app
+  -- Make sure lui.Application is created first
   lib.Application()
-  -- Use original function from now
   class.new = orig
-  -- Execute original function
   return orig(...)
 end
 

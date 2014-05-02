@@ -7,23 +7,30 @@ local lui = require 'lui'
 local should = lut.Test 'lui.Window'
 local Window = lui.Window
 
+local function makeWin(...)
+  local win = Window(...)
+  win:animateFrame(false)
+  win:show()
+  return win
+end
+
 function should.autoload()
   assertType('table', Window)
 end
 
 function should.print()
-  local win = Window()
+  local win = makeWin()
   assertMatch('lui.Window: 0x%d', win:__tostring())
 end
 
 
 function should.respondToDeleted()
-  local win = Window()
+  local win = makeWin()
   assertFalse(win:deleted())
 end
 
 function should.respondToMove()
-  local win = Window()
+  local win = makeWin()
   win:move(15, 32)
   local x, y = win:frame()
   assertEqual(15, x)
@@ -31,15 +38,28 @@ function should.respondToMove()
 end
 
 function should.respondToResize()
-  local win = Window()
+  local win = makeWin()
   win:resize(150, 320)
   local _, _, w, h = win:frame()
   assertEqual(150, w)
   assertEqual(320, h)
 end
 
+function should.getScreenSize()
+  local w, h = lui.Window.screenSize()
+  assertInRange(200, 10000, w)
+  assertInRange(200, 10000, h)
+end
+
+function should.getTitleBarSize()
+  local t1 = Window(lui.Window.Borderless):titleBarHeight()
+  local t2 = Window(lui.Window.Titled):titleBarHeight()
+  assertType('number', t1)
+  assertLessThen(t2, t1)
+end
+
 function should.setAndReturnFrame()
-  local win = Window()
+  local win = makeWin()
   win:setFrame(100, 20, 200, 300)
   local x, y, w, h = win:frame()
   assertEqual(100, x)
@@ -49,7 +69,7 @@ function should.setAndReturnFrame()
 end
 
 function should.triggerResizedCallback()
-  local win = Window()
+  local win = makeWin()
   win:animateFrame(false)
   local s = {}
   function win:resized(w, h)
@@ -61,7 +81,7 @@ function should.triggerResizedCallback()
 end
 
 function should.triggerMovedCallback()
-  local win = Window()
+  local win = makeWin()
   win:animateFrame(false)
   local s = {}
   function win:moved(x, y)
@@ -73,9 +93,19 @@ function should.triggerMovedCallback()
 end
 
 function should.respondToAnimateFrame()
-  local win = Window()
+  local win = makeWin()
   assertPass(function()
     win:animateFrame(false)
+  end)
+end
+
+function should.hide()
+  local win = makeWin()
+  win:show()
+  assertPass(function()
+    win:hide()
+    win:show()
+    win:hide()
   end)
 end
 

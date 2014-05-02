@@ -200,43 +200,81 @@ using namespace lui;
 class Window::Implementation {
   Window *master_;
   LWindow *win_;
+  NSRect frame_;
+  int style_;
 
 public:
-  Implementation(Window *master, int flags)
-   : master_(master) {
-    NSRect frame = NSMakeRect(0, 0, 200, 200);
-    win_ = [[LWindow alloc] initWithContentRect:frame
-                                      styleMask:flags
-                                        backing:NSBackingStoreBuffered
-                                          defer:NO];
-    [win_ setMaster:master];
-    [win_ setBackgroundColor:[NSColor blueColor]];
-    [win_ makeKeyAndOrderFront:NSApp];
+  Implementation(Window *master, int style)
+   : master_(master)
+   , win_(NULL)
+   , style_(style) {
+    NSRect screen = [[NSScreen mainScreen] frame];
+    frame_ = NSMakeRect(20, screen.size.height - 20, 200, 200);
   }
 
   ~Implementation() {
-    [win_ autorelease];
+    if (win_) {
+      [win_ autorelease];
+    }
+  }
+
+  inline void show() {
+    if (!win_) {
+      win_   = [[LWindow alloc] initWithContentRect:frame_
+                                          styleMask:style_
+                                            backing:NSBackingStoreBuffered
+                                              defer:YES];
+      [win_ setMaster:master_];
+      [win_ makeKeyAndOrderFront:NSApp];
+    }
+  }
+
+  inline void hide() {
+    if (win_) {
+      frame_ = [win_ frame];
+      [win_ autorelease];
+      [win_ close];
+      win_ = NULL;
+    }
   }
 
   inline LuaStackSize frame(lua_State *L) {
-    NSRect frame = [win_ frame];
+    NSRect frame  = win_ ? [win_ frame] : frame_;
+    NSRect cframe = win_ ? [[win_ contentView] frame] : frame_;
     lua_pushnumber(L, frame.origin.x);
     lua_pushnumber(L, frame.origin.y);
-    lua_pushnumber(L, frame.size.width);
-    lua_pushnumber(L, frame.size.height);
+    lua_pushnumber(L, cframe.size.width);
+    lua_pushnumber(L, cframe.size.height);
     return 4;
   }
 
   inline void setFrame(double x, double y, double w, double h) {
-    [win_ setFrame:NSMakeRect(x, y, w, h)
-           display:YES
-           animate:master_->animate_frame_ && [win_ isVisible]];
+    if (win_) {
+      // Change frame. We must add space for title bar.
+      [win_ setFrame:NSMakeRect(x, y, w, h + titleBarHeight())
+             display:YES
+             animate:master_->animate_frame_ && [win_ isVisible]];
+    } else {
+      // On new window, space for title bar is automatically added.
+      frame_ = NSMakeRect(x, y, w, h);
+    }
   }
+
+  double titleBarHeight() {
+    NSRect frame = NSMakeRect (0, 0, 100, 100);
+
+    NSRect contentRect;
+    contentRect = [NSWindow contentRectForFrameRect: frame
+                                          styleMask: style_];
+
+    return (frame.size.height - contentRect.size.height);
+  }
+
 };
 
-Window::Window(int window_flags) 
+Window::Window(int style) 
   : animate_frame_(true) {
-  impl_ = new Window::Implementation(this, window_flags);
+  impl_ = new Window::Implementation(this, style);
 }
 
 Window::~Window() {
@@ -250,4 +288,26 @@ void Window::setFrame(double x, double y, double w, double h) {
 LuaStackSize Window::frame(lua_State *L) {
   return impl_->frame(L);
 }
+
+void Window::show() {
+  impl_->show();
+  moved();
+  resized();
+}
+
+void Window::hide() {
+  impl_->hide();
+}
+
+LuaStackSize Window::screenSize(lua_State *L) {
+  NSRect frame = [[NSScreen mainScreen] frame];
+  lua_pushnumber(L, frame.size.width);
+  lua_pushnumber(L, frame.size.height);
+  return 2;
+}
+
+double Window::titleBarHeight() {
+  return impl_->titleBarHeight();
+}
+
 

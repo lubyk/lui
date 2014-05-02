@@ -1,7 +1,7 @@
 local lut = require 'lut'
 lut.Doc.make {
   sources = {
-    'lub',
+    'lui',
   },
   target = 'html',
   format = 'html',

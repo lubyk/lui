@@ -11,15 +11,15 @@
 
 using namespace lui;
 
-/** lui::Window::Window(int window_flags=Default)
+/** lui::Window::Window(int style=Default)
  * include/lui/Window.h:56
  */
 static int Window_Window(lua_State *L) {
   try {
     int top__ = lua_gettop(L);
     if (top__ >= 1) {
-      int window_flags = dub::checkint(L, 1);
-      Window *retval__ = new Window(window_flags);
+      int style = dub::checkint(L, 1);
+      Window *retval__ = new Window(style);
       retval__->dub_pushobject(L, retval__, "lui.Window", true);
       return 1;
     } else {
@@ -55,8 +55,24 @@ static int Window__Window(lua_State *L) {
   return dub::error(L);
 }
 
+/** double lui::Window::titleBarHeight()
+ * include/lui/Window.h:62
+ */
+static int Window_titleBarHeight(lua_State *L) {
+  try {
+    Window *self = *((Window **)dub::checksdata(L, 1, "lui.Window"));
+    lua_pushnumber(L, self->titleBarHeight());
+    return 1;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "titleBarHeight: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "titleBarHeight: Unknown exception");
+  }
+  return dub::error(L);
+}
+
 /** void lui::Window::animateFrame(bool should_animate)
- * include/lui/Window.h:60
+ * include/lui/Window.h:64
  */
 static int Window_animateFrame(lua_State *L) {
   try {
@@ -73,7 +89,7 @@ static int Window_animateFrame(lua_State *L) {
 }
 
 /** void lui::Window::setFrame(double x, double y, double w, double h)
- * include/lui/Window.h:64
+ * include/lui/Window.h:68
  */
 static int Window_setFrame(lua_State *L) {
   try {
@@ -93,7 +109,7 @@ static int Window_setFrame(lua_State *L) {
 }
 
 /** LuaStackSize lui::Window::frame(lua_State *L)
- * include/lui/Window.h:66
+ * include/lui/Window.h:70
  */
 static int Window_frame(lua_State *L) {
   try {
@@ -103,6 +119,52 @@ static int Window_frame(lua_State *L) {
     lua_pushfstring(L, "frame: %s", e.what());
   } catch (...) {
     lua_pushfstring(L, "frame: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** void lui::Window::show()
+ * include/lui/Window.h:72
+ */
+static int Window_show(lua_State *L) {
+  try {
+    Window *self = *((Window **)dub::checksdata(L, 1, "lui.Window"));
+    self->show();
+    return 0;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "show: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "show: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** void lui::Window::hide()
+ * include/lui/Window.h:74
+ */
+static int Window_hide(lua_State *L) {
+  try {
+    Window *self = *((Window **)dub::checksdata(L, 1, "lui.Window"));
+    self->hide();
+    return 0;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "hide: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "hide: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** static LuaStackSize lui::Window::screenSize(lua_State *L)
+ * include/lui/Window.h:60
+ */
+static int Window_screenSize(lua_State *L) {
+  try {
+    return Window::screenSize(L);
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "screenSize: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "screenSize: Unknown exception");
   }
   return dub::error(L);
 }
@@ -122,9 +184,13 @@ static int Window___tostring(lua_State *L) {
 static const struct luaL_Reg Window_member_methods[] = {
   { "new"          , Window_Window        },
   { "__gc"         , Window__Window       },
+  { "titleBarHeight", Window_titleBarHeight },
   { "animateFrame" , Window_animateFrame  },
   { "setFrame"     , Window_setFrame      },
   { "frame"        , Window_frame         },
+  { "show"         , Window_show          },
+  { "hide"         , Window_hide          },
+  { "screenSize"   , Window_screenSize    },
   { "__tostring"   , Window___tostring    },
   { "deleted"      , dub::isDeleted       },
   { NULL, NULL},
