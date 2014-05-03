@@ -12,7 +12,7 @@
 using namespace lui;
 
 /** lui::Window::Window(int style=Default)
- * include/lui/Window.h:56
+ * include/lui/Window.h:70
  */
 static int Window_Window(lua_State *L) {
   try {
@@ -36,7 +36,7 @@ static int Window_Window(lua_State *L) {
 }
 
 /** lui::Window::~Window()
- * include/lui/Window.h:58
+ * include/lui/Window.h:72
  */
 static int Window__Window(lua_State *L) {
   try {
@@ -56,7 +56,7 @@ static int Window__Window(lua_State *L) {
 }
 
 /** double lui::Window::titleBarHeight()
- * include/lui/Window.h:62
+ * include/lui/Window.h:76
  */
 static int Window_titleBarHeight(lua_State *L) {
   try {
@@ -72,7 +72,7 @@ static int Window_titleBarHeight(lua_State *L) {
 }
 
 /** void lui::Window::animateFrame(bool should_animate)
- * include/lui/Window.h:64
+ * include/lui/Window.h:78
  */
 static int Window_animateFrame(lua_State *L) {
   try {
@@ -89,7 +89,7 @@ static int Window_animateFrame(lua_State *L) {
 }
 
 /** void lui::Window::setFrame(double x, double y, double w, double h)
- * include/lui/Window.h:68
+ * include/lui/Window.h:82
  */
 static int Window_setFrame(lua_State *L) {
   try {
@@ -109,7 +109,7 @@ static int Window_setFrame(lua_State *L) {
 }
 
 /** LuaStackSize lui::Window::frame(lua_State *L)
- * include/lui/Window.h:70
+ * include/lui/Window.h:84
  */
 static int Window_frame(lua_State *L) {
   try {
@@ -124,7 +124,7 @@ static int Window_frame(lua_State *L) {
 }
 
 /** void lui::Window::show()
- * include/lui/Window.h:72
+ * include/lui/Window.h:86
  */
 static int Window_show(lua_State *L) {
   try {
@@ -140,7 +140,7 @@ static int Window_show(lua_State *L) {
 }
 
 /** void lui::Window::hide()
- * include/lui/Window.h:74
+ * include/lui/Window.h:88
  */
 static int Window_hide(lua_State *L) {
   try {
@@ -155,8 +155,50 @@ static int Window_hide(lua_State *L) {
   return dub::error(L);
 }
 
+/** void lui::Window::simulateClick(double x, double y, int op=Window::MouseDown, int btn=Window::LeftButton, int mod=0)
+ * include/lui/Window.h:92
+ */
+static int Window_simulateClick(lua_State *L) {
+  try {
+    Window *self = *((Window **)dub::checksdata(L, 1, "lui.Window"));
+    int top__ = lua_gettop(L);
+    if (top__ >= 6) {
+      double x = dub::checknumber(L, 2);
+      double y = dub::checknumber(L, 3);
+      int op = dub::checkint(L, 4);
+      int btn = dub::checkint(L, 5);
+      int mod = dub::checkint(L, 6);
+      self->simulateClick(x, y, op, btn, mod);
+      return 0;
+    } else if (top__ >= 5) {
+      double x = dub::checknumber(L, 2);
+      double y = dub::checknumber(L, 3);
+      int op = dub::checkint(L, 4);
+      int btn = dub::checkint(L, 5);
+      self->simulateClick(x, y, op, btn);
+      return 0;
+    } else if (top__ >= 4) {
+      double x = dub::checknumber(L, 2);
+      double y = dub::checknumber(L, 3);
+      int op = dub::checkint(L, 4);
+      self->simulateClick(x, y, op);
+      return 0;
+    } else {
+      double x = dub::checknumber(L, 2);
+      double y = dub::checknumber(L, 3);
+      self->simulateClick(x, y);
+      return 0;
+    }
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "simulateClick: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "simulateClick: Unknown exception");
+  }
+  return dub::error(L);
+}
+
 /** static LuaStackSize lui::Window::screenSize(lua_State *L)
- * include/lui/Window.h:60
+ * include/lui/Window.h:74
  */
 static int Window_screenSize(lua_State *L) {
   try {
@@ -190,6 +232,7 @@ static const struct luaL_Reg Window_member_methods[] = {
   { "frame"        , Window_frame         },
   { "show"         , Window_show          },
   { "hide"         , Window_hide          },
+  { "simulateClick", Window_simulateClick },
   { "screenSize"   , Window_screenSize    },
   { "__tostring"   , Window___tostring    },
   { "deleted"      , dub::isDeleted       },
@@ -205,6 +248,11 @@ static const struct dub::const_Reg Window_const[] = {
   { "Resizable"    , Window::Resizable    },
   { "TexturedBackground", Window::TexturedBackground },
   { "Default"      , Window::Default      },
+  { "MouseDown"    , Window::MouseDown    },
+  { "MouseUp"      , Window::MouseUp      },
+  { "DoubleClick"  , Window::DoubleClick  },
+  { "LeftButton"   , Window::LeftButton   },
+  { "RightButton"  , Window::RightButton  },
   { NULL, 0},
 };
 

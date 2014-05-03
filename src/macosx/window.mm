@@ -169,21 +169,87 @@ using namespace lui;
 ///   return 0;
 /// }
 
+// ============================================== LView (objC)
+
+@interface LView : NSView {
+  Window * master_;
+}
+
+- (id)initWithMaster:(Window*) master;
+
+@end
+
+@implementation LView
+
+- (id)initWithMaster:(Window*) master {
+  self = [super init];
+  if (self) {
+    master_ = master;
+  }
+  return self;
+}
+
+- (BOOL)acceptsFirstResponder {
+  return YES;
+}
+
+- (void)mouseDown:(NSEvent *)theEvent {
+  printf("event interval: %f // %f // %f\n", [theEvent timestamp], [[NSDate date] timeIntervalSince1970], CVGetCurrentHostTime());
+  NSPoint pos = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+  int count = [theEvent clickCount];
+  int type  = count == 1 ? Window::MouseDown: Window::DoubleClick;
+  // TODO convert modifier flags to LWindow flags
+  // [theEvent modifierFlags]);
+  master_->click(pos.x, pos.y, type, Window::LeftButton, 0);
+}
+
+- (void)mouseUp:(NSEvent *)theEvent {
+  NSPoint pos = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+  int count = [theEvent clickCount];
+  int type  = count == 1 ? Window::MouseUp: Window::DoubleClick;
+  // TODO convert modifier flags to LWindow flags
+  // [theEvent modifierFlags]);
+  if (type == Window::MouseUp) {
+    master_->click(pos.x, pos.y, type, Window::LeftButton, 0);
+  }
+  // ignore double click mouse up
+}
+
+@end
+
 // ============================================== LWindow (objC)
 
 @interface LWindow : NSWindow <NSWindowDelegate> {
   Window * master_;
 }
 
-- (void)setMaster:(Window*) master;
+- (id)initWithContentRect:(NSRect)contentRect
+                styleMask:(NSUInteger)windowStyle
+                  backing:(NSBackingStoreType)bufferingType
+                    defer:(BOOL)deferCreation
+                   master:(Window*)master;
 
 @end
 
 @implementation LWindow
 
-- (void)setMaster:(Window*) master {
-  master_ = master;
-  [self setDelegate:self];
+- (id)initWithContentRect:(NSRect)contentRect
+                styleMask:(NSUInteger)windowStyle
+                  backing:(NSBackingStoreType)bufferingType
+                    defer:(BOOL)deferCreation
+                   master:(Window*)master {
+
+  self = [super initWithContentRect:contentRect
+                          styleMask:windowStyle
+                            backing:bufferingType
+                              defer:deferCreation];
+  if (self) {
+    master_ = master;
+    // setup LView as content view
+    [self setContentView:[[[LView alloc] initWithMaster:master] autorelease]];
+    [self setDelegate:self];
+  }
+  return self;
 }
 
 - (void)windowDidResize:(NSNotification *)notification {
@@ -223,8 +289,8 @@ public:
       win_   = [[LWindow alloc] initWithContentRect:frame_
                                           styleMask:style_
                                             backing:NSBackingStoreBuffered
-                                              defer:YES];
-      [win_ setMaster:master_];
+                                              defer:YES
+                                             master:master_];
       [win_ makeKeyAndOrderFront:NSApp];
     }
   }
@@ -270,6 +336,40 @@ public:
     return (frame.size.height - contentRect.size.height);
   }
 
+  // FIXME: click simulation not working
+  inline void simulateClick(double x, double y, int op, int btn, int mod) {
+    if (!win_) {
+      throw dub::Exception("Cannot simulate events on a hidden window.");
+    }
+    NSEventType type;
+    switch(op) {
+      case Window::MouseUp:
+        type = btn == Window::RightButton ? NSRightMouseUp : NSLeftMouseUp;
+        break;
+      case Window::MouseDown:
+        type = btn == Window::RightButton ? NSRightMouseDown : NSLeftMouseDown;
+        break;
+      default:
+        type = NSLeftMouseDown;
+    }
+
+    // FIXME translate modifier flags to NS Flags
+    NSPoint location;
+    location.x = x;
+    location.y = y;
+    NSEvent *event = [NSEvent mouseEventWithType:type
+                                        location:location
+                                   modifierFlags:mod
+                                       timestamp:[[NSProcessInfo processInfo] systemUptime]
+                                    windowNumber:[win_ windowNumber]
+                                         context:[NSGraphicsContext currentContext]
+                                     eventNumber:nil
+                                      clickCount:1
+                                        pressure:nil];
+      
+    [NSApp postEvent:event atStart:NO];
+    printf("simulateClick\n");
+  }
 };
 
 Window::Window(int style) 
@@ -310,4 +410,6 @@ double Window::titleBarHeight() {
   return impl_->titleBarHeight();
 }
 
-
+void Window::simulateClick(double x, double y, int op, int btn, int mod) {
+  impl_->simulateClick(x, y, op, btn, mod);
+}

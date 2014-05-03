@@ -99,9 +99,12 @@ end
 -- Called whenever the window has been or is being moved.
 -- The new position is passed as arguments.
 -- function lib:moved(x, y)
---
+
 -- Called when the window has been or is being resized.
 -- The new size is passed as arguments.
 -- function lib:resized(w, h)
+
+-- Receive mouse click
+-- function lib:click()
 
 return lib

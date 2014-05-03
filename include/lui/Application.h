@@ -55,13 +55,6 @@ public:
   /** Start event loop.
    */
   int exec();
-
-  // Maybe this could be used for automated testing.
-  // void postEvent(lui::Widget *receiver, lui::Event *event)
-
-  /** Return the size of the desktop as a pair (width, height).
-   */
-  // LuaStackSize screenSize(lua_State *L);
 private:
   class Implementation;
   Implementation *impl_;

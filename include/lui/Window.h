@@ -38,12 +38,12 @@ namespace lui {
  * click, keyboard, move and resized.
  *
  * @dub push: dub_pushobject
- *      ignore: resized, moved
+ *      ignore: resized, moved, click
  */
 class Window : public dub::Thread {
 public:
 
-  enum {
+  enum WindowStyles {
     Borderless         = 0,
     Titled             = 1 << 0,
     Closable           = 1 << 1,
@@ -52,6 +52,20 @@ public:
     TexturedBackground = 1 << 8,
     Default            = 1 + 2 + 4 + 8,
   };
+
+  enum ClickTypes {
+    MouseDown    = 1,
+    MouseUp      = 2,
+    DoubleClick  = 3,
+  };
+  
+  enum MouseButtons {
+    // NoButton     = 0,
+    LeftButton   = 1,
+    RightButton  = 2,
+    // MiddleButton = 3,
+  };
+
   
   Window(int style = Default);
 
@@ -73,7 +87,11 @@ public:
 
   void hide();
 
-  // =================================== CALLBACK
+  /** Simulate mouse event (used for automated testing).
+   */
+  void simulateClick(double x, double y, int op = Window::MouseDown, int btn = Window::LeftButton, int mod = 0);
+
+  // =================================== CALLBACKS
 
   void resized() {
     if (!dub_pushcallback("resized")) return;
@@ -98,6 +116,19 @@ public:
     // <func> <self> <x> <y>
     dub_call(3, 0);
   }
+
+  void click(double x, double y, int op, int btn, int mod) {
+    if (!dub_pushcallback("click")) return;
+    // <func> <self>
+    lua_pushnumber(dub_L, x);
+    lua_pushnumber(dub_L, y);
+    lua_pushnumber(dub_L, op);
+    lua_pushnumber(dub_L, btn);
+    lua_pushnumber(dub_L, mod);
+    // <func> <self> <x> <y> <op> <btn> <mod>
+    dub_call(6, 0);
+  }
+
 private:
   class Implementation;
   Implementation *impl_;

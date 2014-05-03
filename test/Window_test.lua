@@ -92,6 +92,28 @@ function should.triggerMovedCallback()
   assertEqual(32, s.y)
 end
 
+function should.receiveClick()
+  local win = makeWin()
+  local ev
+  function win:click(x, y, op, btn, mod)
+    ev = {
+      x = x,
+      y = y,
+      op = op,
+      btn = btn,
+      mod = mod,
+    }
+  end
+  win:simulateClick(30, 40)
+  assertValueEqual({
+    x   = 30,
+    y   = 40,
+    op  = lui.Window.MouseDown,
+    btn = lui.Window.LeftButton,
+    mod = 0,
+  }, ev)
+end
+
 function should.respondToAnimateFrame()
   local win = makeWin()
   assertPass(function()
