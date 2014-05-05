@@ -51,13 +51,6 @@ function should.getScreenSize()
   assertInRange(200, 10000, h)
 end
 
-function should.getTitleBarSize()
-  local t1 = View(lui.View.Borderless):titleBarHeight()
-  local t2 = View(lui.View.Titled):titleBarHeight()
-  assertType('number', t1)
-  assertLessThen(t2, t1)
-end
-
 function should.setAndReturnFrame()
   local view = makeView()
   view:setFrame(100, 20, 200, 300)
@@ -150,6 +143,17 @@ function should.addChild()
   end)
   view:show()
 end
+
+function should.respondToIsFullscreen()
+  local win = makeView()
+  assertFalse(win:isFullscreen())
+  win:swapFullscreen()
+  assertTrue(win:isFullscreen())
+  win:close()
+end
+
+
+should.ignore.click = true
 
 should:test()
 

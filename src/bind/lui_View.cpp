@@ -78,24 +78,8 @@ static int View_setParent(lua_State *L) {
   return dub::error(L);
 }
 
-/** double lui::View::titleBarHeight()
- * include/lui/View.h:83
- */
-static int View_titleBarHeight(lua_State *L) {
-  try {
-    View *self = *((View **)dub::checksdata(L, 1, "lui.View"));
-    lua_pushnumber(L, self->titleBarHeight());
-    return 1;
-  } catch (std::exception &e) {
-    lua_pushfstring(L, "titleBarHeight: %s", e.what());
-  } catch (...) {
-    lua_pushfstring(L, "titleBarHeight: Unknown exception");
-  }
-  return dub::error(L);
-}
-
 /** void lui::View::animateFrame(bool should_animate)
- * include/lui/View.h:85
+ * include/lui/View.h:83
  */
 static int View_animateFrame(lua_State *L) {
   try {
@@ -112,7 +96,7 @@ static int View_animateFrame(lua_State *L) {
 }
 
 /** void lui::View::setFrame(double x, double y, double w, double h)
- * include/lui/View.h:89
+ * include/lui/View.h:87
  */
 static int View_setFrame(lua_State *L) {
   try {
@@ -132,7 +116,7 @@ static int View_setFrame(lua_State *L) {
 }
 
 /** LuaStackSize lui::View::frame(lua_State *L)
- * include/lui/View.h:91
+ * include/lui/View.h:89
  */
 static int View_frame(lua_State *L) {
   try {
@@ -147,7 +131,7 @@ static int View_frame(lua_State *L) {
 }
 
 /** void lui::View::show()
- * include/lui/View.h:93
+ * include/lui/View.h:91
  */
 static int View_show(lua_State *L) {
   try {
@@ -163,7 +147,7 @@ static int View_show(lua_State *L) {
 }
 
 /** void lui::View::hide()
- * include/lui/View.h:95
+ * include/lui/View.h:93
  */
 static int View_hide(lua_State *L) {
   try {
@@ -178,8 +162,41 @@ static int View_hide(lua_State *L) {
   return dub::error(L);
 }
 
+/** void lui::View::setFullscreen(bool should_fullscreen)
+ * include/lui/View.h:95
+ */
+static int View_setFullscreen(lua_State *L) {
+  try {
+    View *self = *((View **)dub::checksdata(L, 1, "lui.View"));
+    bool should_fullscreen = dub::checkboolean(L, 2);
+    self->setFullscreen(should_fullscreen);
+    return 0;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "setFullscreen: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "setFullscreen: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** bool lui::View::isFullscreen()
+ * include/lui/View.h:97
+ */
+static int View_isFullscreen(lua_State *L) {
+  try {
+    View *self = *((View **)dub::checksdata(L, 1, "lui.View"));
+    lua_pushboolean(L, self->isFullscreen());
+    return 1;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "isFullscreen: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "isFullscreen: Unknown exception");
+  }
+  return dub::error(L);
+}
+
 /** void lui::View::simulateClick(double x, double y, int op=View::MouseDown, int btn=View::LeftButton, int mod=0)
- * include/lui/View.h:99
+ * include/lui/View.h:101
  */
 static int View_simulateClick(lua_State *L) {
   try {
@@ -250,12 +267,13 @@ static const struct luaL_Reg View_member_methods[] = {
   { "new"          , View_View            },
   { "__gc"         , View__View           },
   { "setParent"    , View_setParent       },
-  { "titleBarHeight", View_titleBarHeight  },
   { "animateFrame" , View_animateFrame    },
   { "setFrame"     , View_setFrame        },
   { "frame"        , View_frame           },
   { "show"         , View_show            },
   { "hide"         , View_hide            },
+  { "setFullscreen", View_setFullscreen   },
+  { "isFullscreen" , View_isFullscreen    },
   { "simulateClick", View_simulateClick   },
   { "screenSize"   , View_screenSize      },
   { "__tostring"   , View___tostring      },

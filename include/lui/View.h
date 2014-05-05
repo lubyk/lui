@@ -80,8 +80,6 @@ public:
 
   static LuaStackSize screenSize(lua_State *L);
 
-  double titleBarHeight();
-
   void animateFrame(bool should_animate) {
     animate_frame_ = should_animate;
   }
@@ -93,6 +91,10 @@ public:
   void show();
 
   void hide();
+
+  void setFullscreen(bool should_fullscreen);
+
+  bool isFullscreen();
 
   /** Simulate mouse event (used for automated testing).
    */

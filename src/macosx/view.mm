@@ -288,6 +288,7 @@ class View::Implementation {
   int window_style_;
   bool is_visible_;
   bool is_window_;
+  bool is_fullscreen_;
 
 public:
   Implementation(View *master, int style)
@@ -296,7 +297,9 @@ public:
    , view_(NULL)
    , window_style_(style)
    , is_visible_(false)
-   , is_window_(true) {
+   , is_window_(true)
+   , is_fullscreen_(false)
+  {
     NSRect screen = [[NSScreen mainScreen] frame];
     frame_ = NSMakeRect(20, screen.size.height - 20, 200, 200);
     view_ = [[LView alloc] initWithFrame:frame_
@@ -332,11 +335,7 @@ public:
     if (is_visible_) {
       if (is_window_) {
         // store frame and hide window
-        frame_.origin = [win_  frame].origin;
-        frame_.size   = [view_ frame].size;
-        [win_ autorelease];
-        [win_ close];
-        win_ = NULL;
+        deleteWindow(true);
       } else {
         // store frame and hide view
         frame_ = [view_ frame];
@@ -447,10 +446,7 @@ public:
       [view_ setFrame:frame];
 
       if (is_window_) {
-        [win_ autorelease];
-        [win_ close];
-
-        win_ = NULL;
+        deleteWindow(false);
         is_window_ = false;
       } 
 
@@ -479,21 +475,70 @@ public:
     }
   }
 
+  void setFullscreen(bool should_fullscreen) {
+    if (should_fullscreen == is_fullscreen_) return;
+    is_fullscreen_ = should_fullscreen;
+
+    if (is_visible_) {
+      // only store frame when passing from base to full.
+      deleteWindow(should_fullscreen);
+      createWindow();
+    }
+  }
+
+  bool isFullscreen() {
+    return is_fullscreen_;
+  }
+    
   private:
 
   void createWindow() {
     if (!win_) {
-      win_ = [[LWindow alloc] initWithContentRect:frame_
-                                        styleMask:window_style_
-                                          backing:NSBackingStoreBuffered
-                                            defer:YES
-                                           master:master_
-                                             view:view_];
-      [win_ setReleasedWhenClosed:NO];
+      if (is_fullscreen_) {
+        // Create a screen-sized window on the display you want to take over
+        NSRect screenRect = [[NSScreen mainScreen] frame];
+
+        // Initialize the window making it size of the screen and borderless
+        win_ = [[LWindow alloc] initWithContentRect:screenRect
+                                          styleMask:NSBorderlessWindowMask
+                                            backing:NSBackingStoreBuffered
+                                              defer:YES
+                                             master:master_
+                                               view:view_];
+
+        // Set the window level to be above the menu bar to cover everything else
+        [win_ setLevel:NSMainMenuWindowLevel+1];
+
+        // // Set opaque
+        [win_ setOpaque:YES];
+
+        // Hide this when user switches to another window (or app)
+        // do not hide or when working with two screens it's bad...
+        // [win_ setHidesOnDeactivate:YES];
+      } else {
+        win_ = [[LWindow alloc] initWithContentRect:frame_
+                                          styleMask:window_style_
+                                            backing:NSBackingStoreBuffered
+                                              defer:YES
+                                             master:master_
+                                               view:view_];
+      }
       [win_ makeKeyAndOrderFront:NSApp];
+      [win_ setReleasedWhenClosed:NO];
     }
   }
-    
+
+  void deleteWindow(bool store_frame) {
+    if (win_) {
+      if (store_frame) {
+        frame_.origin = [win_  frame].origin;
+        frame_.size   = [view_ frame].size;
+      }
+      [win_ autorelease];
+      [win_ close];
+      win_ = NULL;
+    }
+  }
 };
 
 View::View(int style) 
@@ -530,14 +575,18 @@ LuaStackSize View::screenSize(lua_State *L) {
   return 2;
 }
 
-double View::titleBarHeight() {
-  return impl_->titleBarHeight();
-}
-
 void View::simulateClick(double x, double y, int op, int btn, int mod) {
   impl_->simulateClick(x, y, op, btn, mod);
 }
 
 void View::setParent(View *parent) {
   impl_->setParent(parent);
+}
+
+void View::setFullscreen(bool should_fullscreen) {
+  impl_->setFullscreen(should_fullscreen);
+}
+
+bool View::isFullscreen() {
+  return impl_->isFullscreen();
 }

@@ -34,6 +34,12 @@ local core = require 'lui.core'
 local lib   = core.View
 local o_new = lib.new
 local Default = core.View.Default
+local MouseUp, MouseDown, DoubleClick = lib.MouseUp, lib.MouseDown, lib.DoubleClick
+local MouseCallback = {
+  [MouseUp]     = 'mouseUp',
+  [MouseDown]   = 'mouseDown',
+  [DoubleClick] = 'doubleClick',
+}
 local o_setParent = lib.setParent
 
 -- # Constructor
@@ -104,15 +110,36 @@ function lib:setParent(parent)
   end
 end
 
+-- Add a child view. The screen position of the child and its visibility are
+-- kept as they were before.
 function lib:addChild(child)
   child:setParent(self)
 end
+
+-- # Display
 
 -- Show view. This triggers #moved and #resized callbacks.
 -- function lib:show()
 
 -- Hide view.
 -- function lib:hide()
+
+-- Close window (same as #hide).
+-- function lib:close()
+
+-- nodoc
+lib.close = lib.hide
+
+-- Set fullscreen mode.
+-- function lib:setFullscreen(should_fullscreen)
+
+-- Return true if the view is actually fullscreen.
+-- function lib:isFullscreen()
+
+-- Swap fullscreen display.
+function lib:swapFullscreen()
+  self:setFullscreen(not self:isFullscreen())
+end
 
 -- # Move/resize
 
@@ -140,9 +167,6 @@ end
 -- Set the view's visible frame (without title bar).
 -- function lib:setFrame(x, y, w, h)
 
--- Get title bar height.
--- function lib.titleBarHeight()
-
 -- Turn view resize/move animation on or off.
 -- function lib:animateFrame(should_animate)
 
@@ -156,8 +180,30 @@ end
 -- The new size is passed as arguments.
 -- function lib:resized(w, h)
 
--- Receive mouse click
--- function lib:click()
+-- Receive any mouse click (mouse down, mouse up, double click). If this is implemented
+-- the #mouseDown, #mouseUp and #doubleClick are not called. To call default
+-- click behaviour, you can use:
+--
+--   function lib:click(x, y, op, btn, mod)
+--     -- ...
+--     -- default behavior
+--     lui.View.click(self, x, y, op, btn, mod)
+--   end
+function lib:click(x, y, op, btn, mod)
+  print("click", x, y, op, btn, MouseCallback[op])
+  local callback = self[MouseCallback[op]]
+  if callback then
+    callback(self, x, y, btn, mod)
+  end
+end
 
+-- Called on mouse down. This is not called if #click is reimplemented.
+-- function lib:mouseDown(x, y, btn, mod)
+
+-- Called on mouse up. This is not called if #click is reimplemented.
+-- function lib:mouseUp(x, y, btn, mod)
+
+-- Called on double click. This is not called if #click is reimplemented.
+-- function lib:doubleClick(x, y, btn, mod)
 return lib
 
