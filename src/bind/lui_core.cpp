@@ -8,13 +8,13 @@
  */
 #include "dub/dub.h"
 #include "lui/Application.h"
-#include "lui/Window.h"
+#include "lui/View.h"
 
 using namespace lui;
 
 extern "C" {
 int luaopen_lui_Application(lua_State *L);
-int luaopen_lui_Window(lua_State *L);
+int luaopen_lui_View(lua_State *L);
 }
 
 // --=============================================== FUNCTIONS
@@ -33,9 +33,9 @@ extern "C" int luaopen_lui_core(lua_State *L) {
   // <lui.Application>
   lua_setfield(L, -2, "Application");
   
-  luaopen_lui_Window(L);
-  // <lui.Window>
-  lua_setfield(L, -2, "Window");
+  luaopen_lui_View(L);
+  // <lui.View>
+  lua_setfield(L, -2, "View");
   
   // <lib>
   return 1;

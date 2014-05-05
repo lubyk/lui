@@ -26,21 +26,24 @@
 
   ==============================================================================
 */
-#ifndef LUBYK_INCLUDE_LUI_WIDGET_H_
-#define LUBYK_INCLUDE_LUI_WIDGET_H_
+#ifndef LUBYK_INCLUDE_LUI_VIEW_H_
+#define LUBYK_INCLUDE_LUI_VIEW_H_
 
 #include "dub/dub.h"
 
 namespace lui {
 
-/** The Window is used to display an OpenGL 3 window context.
- * The Widget uses the following callbacks:  paint, mouse,
- * click, keyboard, move and resized.
+/** The view is used to display an OpenGL 3 window context. A view without a
+ * parent is a window.
  *
  * @dub push: dub_pushobject
  *      ignore: resized, moved, click
  */
-class Window : public dub::Thread {
+class View : public dub::Thread {
+  /** Whether to animate resizing and move operations.
+   */
+  bool animate_frame_;
+
 public:
 
   enum WindowStyles {
@@ -67,9 +70,13 @@ public:
   };
 
   
-  Window(int style = Default);
+  /** Create a view without parent = window.
+   */
+  View(int style = Default);
 
-  ~Window();
+  ~View();
+
+  void setParent(View *parent = NULL);
 
   static LuaStackSize screenSize(lua_State *L);
 
@@ -89,7 +96,7 @@ public:
 
   /** Simulate mouse event (used for automated testing).
    */
-  void simulateClick(double x, double y, int op = Window::MouseDown, int btn = Window::LeftButton, int mod = 0);
+  void simulateClick(double x, double y, int op = View::MouseDown, int btn = View::LeftButton, int mod = 0);
 
   // =================================== CALLBACKS
 
@@ -132,13 +139,9 @@ public:
 private:
   class Implementation;
   Implementation *impl_;
-
-  /** Whether to animate resizing and move operations.
-   */
-  bool animate_frame_;
-
 };
 
 } // namespace lui
 
-#endif // LUBYK_INCLUDE_LUI_WIDGET_H_
+#endif // LUBYK_INCLUDE_LUI_VIEW_H_
+
