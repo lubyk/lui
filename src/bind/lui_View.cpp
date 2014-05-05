@@ -237,6 +237,22 @@ static int View_simulateClick(lua_State *L) {
   return dub::error(L);
 }
 
+/** void lui::View::redraw()
+ * include/lui/View.h:103
+ */
+static int View_redraw(lua_State *L) {
+  try {
+    View *self = *((View **)dub::checksdata(L, 1, "lui.View"));
+    self->redraw();
+    return 0;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "redraw: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "redraw: Unknown exception");
+  }
+  return dub::error(L);
+}
+
 /** static LuaStackSize lui::View::screenSize(lua_State *L)
  * include/lui/View.h:81
  */
@@ -275,6 +291,7 @@ static const struct luaL_Reg View_member_methods[] = {
   { "setFullscreen", View_setFullscreen   },
   { "isFullscreen" , View_isFullscreen    },
   { "simulateClick", View_simulateClick   },
+  { "redraw"       , View_redraw          },
   { "screenSize"   , View_screenSize      },
   { "__tostring"   , View___tostring      },
   { "deleted"      , dub::isDeleted       },

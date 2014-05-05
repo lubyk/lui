@@ -190,7 +190,6 @@ end
 --     lui.View.click(self, x, y, op, btn, mod)
 --   end
 function lib:click(x, y, op, btn, mod)
-  print("click", x, y, op, btn, MouseCallback[op])
   local callback = self[MouseCallback[op]]
   if callback then
     callback(self, x, y, btn, mod)

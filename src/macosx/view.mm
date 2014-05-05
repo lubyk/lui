@@ -1,6 +1,11 @@
 #include "lui/View.h"
+#include "GL/glew.h"
 
 #import <Cocoa/Cocoa.h>
+#import <QuartzCore/CVDisplayLink.h>
+
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
 
 using namespace lui;
 
@@ -11,7 +16,6 @@ using namespace lui;
 /// @end
 /// 
 /// 
-/// #import <QuartzCore/CVDisplayLink.h>
 /// 
 /// @interface LView : NSOpenGLView 
 /// {
@@ -171,12 +175,14 @@ using namespace lui;
 
 // ============================================== LView (objC)
 
-@interface LView : NSView {
+@interface LView : NSOpenGLView {
   View * master_;
-  NSColor *back_;
+  NSOpenGLContext *context_;
 }
 
 - (id)initWithFrame:(NSRect)frame master:(View*) master;
+- (void)prepareOpenGL;
+- (void)linkOpenGL;
 
 @end
 
@@ -186,12 +192,51 @@ using namespace lui;
   self = [super initWithFrame:frame];
   if (self) {
     master_ = master;
-    back_ = [NSColor colorWithDeviceHue:(arc4random() % 256) / 256.0
-                                saturation:1.0
-                                brightness:1.0
-                                     alpha:0.8];
+    [self prepareOpenGL];
   }
   return self;
+}
+
+// This is only called once the view has a window.
+- (void)prepareOpenGL {
+  NSOpenGLPixelFormatAttribute attrs[] =
+  {
+    // NSOpenGLPFADoubleBuffer,
+    // Must specify the 3.2 Core Profile to use OpenGL 3.2
+    NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+    // NSOpenGLPFADoubleBuffer,
+    NSOpenGLPFADepthSize, 24,
+    NSOpenGLPFAColorSize, 24,
+    NSOpenGLPFAAlphaSize, 8,
+    NSOpenGLPFAAccelerated,
+    0
+  };
+
+  NSOpenGLPixelFormat *pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:attrs] autorelease];
+
+  if (!pf) {
+    throw dub::Exception("No OpenGL pixel format.");
+  }
+
+  context_ = [[[NSOpenGLContext alloc] initWithFormat:pf shareContext:nil] autorelease];
+
+  // Crash on legacy function call ? No. Error reporting should be enough.
+  // CGLEnable([context_ CGLContextObj], kCGLCECrashOnRemovedFunctions);
+
+  [self setPixelFormat:pf];
+
+
+  // Turning this on means we can address all pixels on the retina display
+  // instead of having our image zoomed. This has consequences on pixel
+  //  coordinates and we should only work this once everything is working
+  // [self setWantsBestResolutionOpenGLSurface:YES];
+}
+
+// Link OpenGL to view
+- (void)linkOpenGL {
+  [context_ setView:self];
+  [self setOpenGLContext:context_];
+  [context_ makeCurrentContext];
 }
 
 - (BOOL)acceptsFirstResponder {
@@ -200,8 +245,7 @@ using namespace lui;
 
 - (void)drawRect:(NSRect)rect
 {
-  [back_ set];
-  NSRectFill([self bounds]);
+  master_->draw(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
@@ -326,6 +370,8 @@ public:
         [view_ setFrame:frame_];
         [view_ setNeedsDisplay:YES];
       }
+
+      [view_ linkOpenGL];
 
       is_visible_ = true;
     }
@@ -489,6 +535,10 @@ public:
   bool isFullscreen() {
     return is_fullscreen_;
   }
+
+  void redraw() {
+    [view_ setNeedsDisplay:YES];
+  }
     
   private:
 
@@ -589,4 +639,8 @@ void View::setFullscreen(bool should_fullscreen) {
 
 bool View::isFullscreen() {
   return impl_->isFullscreen();
+}
+
+void View::redraw() {
+  impl_->redraw();
 }

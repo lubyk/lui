@@ -20,6 +20,11 @@ local def = {
     linux   = {'stdc++', 'rt'},
     macosx  = {'stdc++ -framework CoreFoundation -framework OpenGL -framework GLUT -lobjc'},
   },
+  -- not needed on Mac OS X
+  -- cmake_extra = [[
+  -- add_subdirectory(src/glew)
+  -- target_link_libraries(${core} ${CMAKE_BINARY_DIR}/glew/libGLEW.a)
+  -- ]]
 }
 
 -- Platform specific sources or link libraries
