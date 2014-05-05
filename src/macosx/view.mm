@@ -206,7 +206,6 @@ using namespace lui;
 
 - (void)mouseDown:(NSEvent *)theEvent {
   NSPoint pos = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-  printf("mouseDown %ix%i\n", (int)pos.x, (int)pos.y);
   int count = [theEvent clickCount];
   int type  = count == 1 ? View::MouseDown: View::DoubleClick;
   // FIXME convert modifier flags to LWindow flags
@@ -399,7 +398,7 @@ public:
     return (frame.size.height - contentRect.size.height);
   }
 
-  // FIXME: click simulation not working
+  // FIXME: click simulation not working (works sometimes: strange)
   void simulateClick(double x, double y, int op, int btn, int mod) {
 
     if (!is_visible_) {
@@ -431,8 +430,7 @@ public:
                                       clickCount:1
                                         pressure:nil];
       
-    printf("simulateClick %ix%i\n", (int)x, (int)y);
-    [NSApp postEvent:event atStart:YES];
+    [NSApp postEvent:event atStart:NO];
   }
 
   void setParent(View *parent) {
@@ -458,6 +456,8 @@ public:
 
       if (is_visible_) {
         [view_ setNeedsDisplay:YES];
+      } else {
+        [view_ setHidden:YES];
       }
     } else {
       if (is_window_) {

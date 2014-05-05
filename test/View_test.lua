@@ -131,6 +131,26 @@ function should.hide()
   end)
 end
 
+function should.setParent()
+  local win = makeView()
+  local view = lui.View()
+  win:show()
+  assertPass(function()
+    view:setParent(win)
+  end)
+  view:show()
+end
+
+function should.addChild()
+  local win = makeView()
+  local view = lui.View()
+  win:show()
+  assertPass(function()
+    win:addChild(view)
+  end)
+  view:show()
+end
+
 should:test()
 
 
