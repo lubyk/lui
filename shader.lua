@@ -138,8 +138,8 @@ effect.fragment = four.Effect.Shader [[
   in vec4 v_color;
 
   // These uniform names must reflect the default_uniforms that we declared.
-  // uniform float saturation;
-  // uniform float time;
+  uniform float saturation;
+  uniform float time;
   float t = 15.0; // time;
 
   out vec4 color;
@@ -152,7 +152,7 @@ effect.fragment = four.Effect.Shader [[
     // float b = saturation + 0.25 * (sin(2*v.x) + sin(v.y));
     // blend effect with interpolated color
     //color = vec4(v_color.r + r, v_color.g + g, v_color.b + b, 1);
-    color = vec4(1.0, 0.0, 0.0, 1.0);
+    color = vec4(0.0, 1.0, 0.0, 1.0);
   }
 ]]
 
@@ -177,7 +177,7 @@ obj = {
 -- We create an OpenGL window with lui.View, set the size and position.
 win = lui.View()
 win:resize(WIN_SIZE.w, WIN_SIZE.h)
-win:move(WIN_POS.x, WIN_POS.y)
+-- win:move(WIN_POS.x, WIN_POS.y)
 
 -- We then setup some simple keyboard actions to toggle fullscreen with
 -- the space bar.

@@ -1,11 +1,12 @@
 #include "lui/View.h"
-#include "GL/glew.h"
 
 #import <Cocoa/Cocoa.h>
-#import <QuartzCore/CVDisplayLink.h>
+// #import <QuartzCore/CVDisplayLink.h>
 
-#include <OpenGL/gl.h>
-#include <OpenGL/glext.h>
+// Avoid including all legacy OpenGL stuff
+#define __gl_h_
+#define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+#include <OpenGL/gl3.h>
 
 using namespace lui;
 
@@ -201,11 +202,12 @@ using namespace lui;
 - (void)prepareOpenGL {
   NSOpenGLPixelFormatAttribute attrs[] =
   {
+    // Double buffering not working. Fixe when needed.
     // NSOpenGLPFADoubleBuffer,
+
+    NSOpenGLPFADepthSize, 24,
     // Must specify the 3.2 Core Profile to use OpenGL 3.2
     NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
-    // NSOpenGLPFADoubleBuffer,
-    NSOpenGLPFADepthSize, 24,
     NSOpenGLPFAColorSize, 24,
     NSOpenGLPFAAlphaSize, 8,
     NSOpenGLPFAAccelerated,
@@ -243,9 +245,23 @@ using namespace lui;
   return YES;
 }
 
+void debugGlError() {
+  GLenum glErr = glGetError();
+  if (glErr != GL_NO_ERROR) {
+    printf("GLError: %i\n", glErr);
+  }
+}
+
 - (void)drawRect:(NSRect)rect
 {
+
+  [[self openGLContext] makeCurrentContext]; 
+
   master_->draw(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+
+  [[self openGLContext] flushBuffer]; 
+
+	// CGLFlushDrawable(static_cast<CGLContextObj>([[self openGLContext] CGLContextObj]));
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
