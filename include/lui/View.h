@@ -37,7 +37,7 @@ namespace lui {
  * parent is a window.
  *
  * @dub push: dub_pushobject
- *      ignore: resized, moved, click, draw
+ *      ignore: resized, moved, click, redraw
  */
 class View : public dub::Thread {
   /** Whether to animate resizing and move operations.
@@ -100,9 +100,16 @@ public:
    */
   void simulateClick(double x, double y, int op = View::MouseDown, int btn = View::LeftButton, int mod = 0);
 
-  void redraw();
+  void swapBuffers();
 
   // =================================== CALLBACKS
+
+  // Called when the OS decides that a redraw is needed.
+  void redraw() {
+    if (!dub_pushcallback("redraw")) return;
+    // <func> <self>
+    dub_call(1, 0);
+  }
 
   void resized() {
     if (!dub_pushcallback("resized")) return;
@@ -138,17 +145,6 @@ public:
     lua_pushnumber(dub_L, mod);
     // <func> <self> <x> <y> <op> <btn> <mod>
     dub_call(6, 0);
-  }
-
-  void draw(double x, double y, double w, double h) {
-    if (!dub_pushcallback("draw")) return;
-    // <func> <self>
-    lua_pushnumber(dub_L, x);
-    lua_pushnumber(dub_L, y);
-    lua_pushnumber(dub_L, w);
-    lua_pushnumber(dub_L, h);
-    // <func> <self> <x> <y> <w> <h>
-    dub_call(5, 0);
   }
 
 private:

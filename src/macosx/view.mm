@@ -4,9 +4,16 @@
 // #import <QuartzCore/CVDisplayLink.h>
 
 // Avoid including all legacy OpenGL stuff
-#define __gl_h_
-#define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
-#include <OpenGL/gl3.h>
+/// #define __gl_h_
+/// #define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+/// #include <OpenGL/gl3.h>
+
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/CGLRenderers.h>
+
+
+void glError(const char *file, int line);
+#define glCheckError() glError(__FILE__,__LINE__)
 
 using namespace lui;
 
@@ -203,12 +210,12 @@ using namespace lui;
   NSOpenGLPixelFormatAttribute attrs[] =
   {
     // Double buffering not working. Fixe when needed.
-    // NSOpenGLPFADoubleBuffer,
+    NSOpenGLPFADoubleBuffer,
 
-    NSOpenGLPFADepthSize, 24,
     // Must specify the 3.2 Core Profile to use OpenGL 3.2
     NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
     NSOpenGLPFAColorSize, 24,
+    NSOpenGLPFADepthSize, 24,
     NSOpenGLPFAAlphaSize, 8,
     NSOpenGLPFAAccelerated,
     0
@@ -254,14 +261,8 @@ void debugGlError() {
 
 - (void)drawRect:(NSRect)rect
 {
-
-  [[self openGLContext] makeCurrentContext]; 
-
-  master_->draw(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
-
-  [[self openGLContext] flushBuffer]; 
-
-	// CGLFlushDrawable(static_cast<CGLContextObj>([[self openGLContext] CGLContextObj]));
+  // FIXME: we cannot draw from this thread !!
+  master_->redraw();
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
@@ -552,8 +553,8 @@ public:
     return is_fullscreen_;
   }
 
-  void redraw() {
-    [view_ setNeedsDisplay:YES];
+  void swapBuffers() {
+    [[view_ openGLContext] flushBuffer];
   }
     
   private:
@@ -657,6 +658,24 @@ bool View::isFullscreen() {
   return impl_->isFullscreen();
 }
 
-void View::redraw() {
-  impl_->redraw();
+void View::swapBuffers() {
+  impl_->swapBuffers();
+}
+
+void glError(const char *file, int line) {
+  GLenum err(glGetError());
+
+  if (err!=GL_NO_ERROR) {
+    const char *error;
+
+    switch(err) {
+      case GL_INVALID_OPERATION:      error="INVALID_OPERATION";      break;
+      case GL_INVALID_ENUM:           error="INVALID_ENUM";           break;
+      case GL_INVALID_VALUE:          error="INVALID_VALUE";          break;
+      case GL_OUT_OF_MEMORY:          error="OUT_OF_MEMORY";          break;
+      case GL_INVALID_FRAMEBUFFER_OPERATION:  error="INVALID_FRAMEBUFFER_OPERATION";  break;
+    }
+
+    throw dub::Exception("GL_%s (%s:%i).\n", error, file, line);
+  }
 }

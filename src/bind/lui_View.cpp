@@ -237,18 +237,18 @@ static int View_simulateClick(lua_State *L) {
   return dub::error(L);
 }
 
-/** void lui::View::redraw()
+/** void lui::View::swapBuffers()
  * include/lui/View.h:103
  */
-static int View_redraw(lua_State *L) {
+static int View_swapBuffers(lua_State *L) {
   try {
     View *self = *((View **)dub::checksdata(L, 1, "lui.View"));
-    self->redraw();
+    self->swapBuffers();
     return 0;
   } catch (std::exception &e) {
-    lua_pushfstring(L, "redraw: %s", e.what());
+    lua_pushfstring(L, "swapBuffers: %s", e.what());
   } catch (...) {
-    lua_pushfstring(L, "redraw: Unknown exception");
+    lua_pushfstring(L, "swapBuffers: Unknown exception");
   }
   return dub::error(L);
 }
@@ -291,7 +291,7 @@ static const struct luaL_Reg View_member_methods[] = {
   { "setFullscreen", View_setFullscreen   },
   { "isFullscreen" , View_isFullscreen    },
   { "simulateClick", View_simulateClick   },
-  { "redraw"       , View_redraw          },
+  { "swapBuffers"  , View_swapBuffers     },
   { "screenSize"   , View_screenSize      },
   { "__tostring"   , View___tostring      },
   { "deleted"      , dub::isDeleted       },

@@ -31,6 +31,8 @@ local WIN_SIZE   = {w = 400, h = 400}
 local WIN_POS    = {x = 10 , y = 10 }
 local SATURATION = 0.4
 
+-- debug disable gc
+collectgarbage('stop')
 -- # Geometry
 --
 -- We must now prepare the geometry that we want to display. In this example,
@@ -140,19 +142,19 @@ effect.fragment = four.Effect.Shader [[
   // These uniform names must reflect the default_uniforms that we declared.
   uniform float saturation;
   uniform float time;
-  float t = 15.0; // time;
+  float t = time;
 
   out vec4 color;
 
   void main() {
 
-    // vec4 v = 20 * (v_vertex + vec4(sin(t/10), sin(t/20), sin(t/30), 0.0));
-    // float r = saturation + 0.25 * (sin(3*v.x) + sin(v.y));
-    // float g = saturation + 0.25 * (sin(v.x) + sin(v.y));
-    // float b = saturation + 0.25 * (sin(2*v.x) + sin(v.y));
+    vec4 v = 20 * (v_vertex + vec4(sin(t/10), sin(t/20), sin(t/30), 0.0));
+    float r = saturation + 0.25 * (sin(3*v.x) + sin(v.y));
+    float g = saturation + 0.25 * (sin(v.x) + sin(v.y));
+    float b = saturation + 0.25 * (sin(2*v.x) + sin(v.y));
     // blend effect with interpolated color
-    //color = vec4(v_color.r + r, v_color.g + g, v_color.b + b, 1);
-    color = vec4(0.0, 1.0, 0.0, 1.0);
+    color = vec4(v_color.r + r, v_color.g + g, v_color.b + b, 1);
+    // color = vec4(0.0, 1.0, 0.0, 1.0);
   }
 ]]
 
@@ -190,27 +192,29 @@ function win:keyboard(key, press)
 end
 
 function win:mouseDown()
-  self:redraw()
+  self:draw()
 end
 
 
 -- In case we resize the window, we want our content to scale so we need to
 -- update the renderer's `size` attribute.
 function win:resized(w, h)
-  print('resized', w, h)
+  -- FIXME: if we call resize during window creation, this is not done from
+  -- the correct thread... Let's wait until we integrate with lens.Scheduler.
   renderer.size = four.V2(w, h)
+  self:draw()
 end
 
 -- The window's paint function calls four.Renderer.render with our camera
 -- and object.
 function win:draw()
-  renderer:logInfo()
-  print('draw')
   renderer:render(camera, {obj})
+  self:swapBuffers()
 end
 
 -- Show the window once all the the callbacks are in place.
 win:show()
+renderer:logInfo()
 
 -- # Runtime
 
