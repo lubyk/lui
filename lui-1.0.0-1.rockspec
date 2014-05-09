@@ -24,6 +24,7 @@ build = {
     ['lui'            ] = 'lui/init.lua',
     ['lui.Application'] = 'lui/Application.lua',
     ['lui.Poller'     ] = 'lui/Poller.lua',
+    ['lui.Timer'      ] = 'lui/Timer.lua',
     ['lui.View'       ] = 'lui/View.lua',
     -- C module
     ['lui.core'       ] = {
@@ -32,6 +33,8 @@ build = {
         'src/bind/dub/dub.cpp~',
         'src/bind/lui_Application.cpp',
         'src/bind/lui_core.cpp',
+        'src/bind/lui_FileHandle.cpp',
+        'src/bind/lui_Timer.cpp',
         'src/bind/lui_View.cpp',
       },
       incdirs   = {'include', 'src/bind'},

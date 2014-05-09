@@ -2,16 +2,17 @@
 
   # Poller when running lui GUI
 
-  This is used internally to bridge lub.Scheduler with the GUI event loop by
-  using an OS Timer for scheduling (timeout) and pass all file descriptors to
-  the OS event loop.
+  This is used internally to bridge lens.Scheduler with the GUI event loop by
+  using an lui.Timer for scheduling (timeout) and pass all file descriptors to
+  the OS event loop with lui.FileHandle.
 
   WARN: This Poller does NOT WORK. It needs reimplementing with new scheduler.
 
 --]]------------------------------------------------------
-require 'lui.SocketNotifier'
-local lib    = class 'lui.Poller'
-local app    = app
+local lui = require 'lui'
+local lib = class 'lui.Poller'
+local Timer      = lui.Timer
+local FileHandle = lui.FileHandle
 local private = {}
 
 -- Create a new lui.Poller. This is used by lui.Application.

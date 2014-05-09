@@ -8,12 +8,16 @@
  */
 #include "dub/dub.h"
 #include "lui/Application.h"
+#include "lui/FileHandle.h"
+#include "lui/Timer.h"
 #include "lui/View.h"
 
 using namespace lui;
 
 extern "C" {
 int luaopen_lui_Application(lua_State *L);
+int luaopen_lui_FileHandle(lua_State *L);
+int luaopen_lui_Timer(lua_State *L);
 int luaopen_lui_View(lua_State *L);
 }
 
@@ -32,6 +36,14 @@ extern "C" int luaopen_lui_core(lua_State *L) {
   luaopen_lui_Application(L);
   // <lui.Application>
   lua_setfield(L, -2, "Application");
+  
+  luaopen_lui_FileHandle(L);
+  // <lui.FileHandle>
+  lua_setfield(L, -2, "FileHandle");
+  
+  luaopen_lui_Timer(L);
+  // <lui.Timer>
+  lua_setfield(L, -2, "Timer");
   
   luaopen_lui_View(L);
   // <lui.View>

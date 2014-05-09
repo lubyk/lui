@@ -143,15 +143,16 @@ effect.fragment = four.Effect.Shader [[
   uniform float saturation;
   uniform float time;
   float t = time;
+  float sat = saturation * (0.5 + 0.5 * sin(t));
 
   out vec4 color;
 
   void main() {
 
     vec4 v = 20 * (v_vertex + vec4(sin(t/10), sin(t/20), sin(t/30), 0.0));
-    float r = saturation + 0.25 * (sin(3*v.x) + sin(v.y));
-    float g = saturation + 0.25 * (sin(v.x) + sin(v.y));
-    float b = saturation + 0.25 * (sin(2*v.x) + sin(v.y));
+    float r = sat + 0.25 * (sin(3*v.x) + sin(v.y));
+    float g = sat + 0.25 * (sin(v.x) + sin(v.y));
+    float b = sat + 0.25 * (sin(2*v.x) + sin(v.y));
     // blend effect with interpolated color
     color = vec4(v_color.r + r, v_color.g + g, v_color.b + b, 1);
     // color = vec4(0.0, 1.0, 0.0, 1.0);
@@ -187,12 +188,12 @@ win:resize(WIN_SIZE.w, WIN_SIZE.h)
 -- Only react to key press (press = true).
 function win:keyboard(key, press)
   if key == mimas.Key_Space and press then
-    win:swapFullScreen()
+    win:swapFullscreen()
   end
 end
 
 function win:mouseDown()
-  self:draw()
+  self:swapFullscreen()
 end
 
 
@@ -224,13 +225,13 @@ renderer:logInfo()
 --
 -- We also change the uniform's saturation with a random value between
 -- [0, 0.8] for a stupid blink effect.
----- timer = lk.Timer(1/60, function()
-----   win:update()
-----   obj.saturation = math.random() * 0.8
----- end)
----- 
----- -- Start the timer.
----- timer:start()
+timer = lui.Timer(1/60, function()
+  win:draw()
+  --obj.saturation = math.random() * 0.8
+end)
+
+-- Start the timer.
+timer:start(1)
 
 -- ## Run
 --
