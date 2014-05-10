@@ -60,6 +60,8 @@ public:
    */
   void setInterval(double interval);
 
+  LuaStackSize __tostring(lua_State *L);
+
 
   // =================================== CALLBACKS
 

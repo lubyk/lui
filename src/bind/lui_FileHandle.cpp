@@ -29,7 +29,7 @@ static int FileHandle_FileHandle(lua_State *L) {
 }
 
 /** virtual lui::FileHandle::~FileHandle()
- * include/lui/FileHandle.h:48
+ * include/lui/FileHandle.h:47
  */
 static int FileHandle__FileHandle(lua_State *L) {
   try {
@@ -44,6 +44,38 @@ static int FileHandle__FileHandle(lua_State *L) {
     lua_pushfstring(L, "__gc: %s", e.what());
   } catch (...) {
     lua_pushfstring(L, "__gc: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** void lui::FileHandle::setEnabled(bool enabled)
+ * include/lui/FileHandle.h:49
+ */
+static int FileHandle_setEnabled(lua_State *L) {
+  try {
+    FileHandle *self = *((FileHandle **)dub::checksdata(L, 1, "lui.FileHandle"));
+    bool enabled = dub::checkboolean(L, 2);
+    self->setEnabled(enabled);
+    return 0;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "setEnabled: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "setEnabled: Unknown exception");
+  }
+  return dub::error(L);
+}
+
+/** LuaStackSize lui::FileHandle::__tostring(lua_State *L)
+ * include/lui/FileHandle.h:51
+ */
+static int FileHandle___tostring(lua_State *L) {
+  try {
+    FileHandle *self = *((FileHandle **)dub::checksdata(L, 1, "lui.FileHandle"));
+    return self->__tostring(L);
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "__tostring: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "__tostring: Unknown exception");
   }
   return dub::error(L);
 }
@@ -66,21 +98,14 @@ static int FileHandle_activated(lua_State *L) {
 
 
 
-// --=============================================== __tostring
-static int FileHandle___tostring(lua_State *L) {
-  FileHandle *self = *((FileHandle **)dub::checksdata_n(L, 1, "lui.FileHandle"));
-  lua_pushfstring(L, "lui.FileHandle: %p", self);
-  
-  return 1;
-}
-
 // --=============================================== METHODS
 
 static const struct luaL_Reg FileHandle_member_methods[] = {
   { "new"          , FileHandle_FileHandle },
   { "__gc"         , FileHandle__FileHandle },
-  { "activated"    , FileHandle_activated },
+  { "setEnabled"   , FileHandle_setEnabled },
   { "__tostring"   , FileHandle___tostring },
+  { "activated"    , FileHandle_activated },
   { "deleted"      , dub::isDeleted       },
   { NULL, NULL},
 };

@@ -42,13 +42,13 @@ namespace lui {
 class FileHandle : public dub::Thread {
 public:
 
-  FileHandle(int fd) {
-  }
+  FileHandle(int fd);
 
-  virtual ~FileHandle() {
-  }
+  virtual ~FileHandle();
 
-  // TODO XXXX
+  void setEnabled(bool enabled);
+  
+  LuaStackSize __tostring(lua_State *L);
 
   // =================================== CALLBACKS
   void activated() {

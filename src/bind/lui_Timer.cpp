@@ -52,7 +52,7 @@ static int Timer__Timer(lua_State *L) {
  * include/lui/Timer.h:50
  */
 static int Timer_start(lua_State *L) {
-  {
+  try {
     Timer *self = *((Timer **)dub::checksdata(L, 1, "lui.Timer"));
     int top__ = lua_gettop(L);
     if (top__ >= 2) {
@@ -63,8 +63,12 @@ static int Timer_start(lua_State *L) {
       self->start();
       return 0;
     }
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "start: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "start: Unknown exception");
   }
-  return 0;
+  return dub::error(L);
 }
 
 /** void lui::Timer::stop()
@@ -100,15 +104,22 @@ static int Timer_setInterval(lua_State *L) {
   return dub::error(L);
 }
 
-
-
-// --=============================================== __tostring
+/** LuaStackSize lui::Timer::__tostring(lua_State *L)
+ * include/lui/Timer.h:63
+ */
 static int Timer___tostring(lua_State *L) {
-  Timer *self = *((Timer **)dub::checksdata_n(L, 1, "lui.Timer"));
-  lua_pushfstring(L, "lui.Timer: %p", self);
-  
-  return 1;
+  try {
+    Timer *self = *((Timer **)dub::checksdata(L, 1, "lui.Timer"));
+    return self->__tostring(L);
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "__tostring: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "__tostring: Unknown exception");
+  }
+  return dub::error(L);
 }
+
+
 
 // --=============================================== METHODS
 

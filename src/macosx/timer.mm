@@ -108,6 +108,11 @@ public:
       start();
     }
   }
+
+  LuaStackSize __tostring(lua_State *L) {
+    lua_pushfstring(L, "lui.Timer %f: %p", interval_, master_);
+    return 1;
+  }
 };
 
 Timer::Timer(double timeout) {
@@ -138,3 +143,6 @@ void Timer::setInterval(double interval) {
   impl_->setInterval(interval);
 }
 
+LuaStackSize Timer::__tostring(lua_State *L) {
+  return impl_->__tostring(L);
+}

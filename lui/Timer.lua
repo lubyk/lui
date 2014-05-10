@@ -6,26 +6,15 @@
 
   Usage example:
   
-    local lub = require 'lub'
     local lui = require 'lui'
 
-    win = lui.Timer()
+    timer = lui.Timer(0.5)
 
-  ## Coordinate system
+    function timer:timeout()
+      -- called when timer fires
+    end
 
-  All coordinates use bottom-left as zero, Y axis pointing up:
-
-    #txt ascii
-    
-    ^ Y
-    |
-    |
-    +------> X
-
-  This means that you need to specify *bottom-left* corner
-  position for window or view position.
-
-
+    timer:start() -- start now
 --]]------------------------------------------------------
 local lub  = require 'lub'
 local lui  = require 'lui'
@@ -39,15 +28,36 @@ local new = lib.new
 
 
 -- Create a new timer without starting it. The interval is specified in seconds.
+-- The callback can be passed in the constructor or set as `timeout` function.
 function lib.new(interval, callback)
   local self = new(interval)
-  self.timeout = callback
+  if callback then
+    self.timeout = callback
+  end
   return self
 end
 
--- FIXME: documentation
+-- # Methods
 
--- Called on double click. This is not called if #click is reimplemented.
--- function lib:doubleClick(x, y, btn, mod)
+-- Start timer with the first "timeout" callback called after `fire_in_seconds`.
+-- This method should be used repetitively for irregular timers instead of
+-- calling #setInterval multiple times. If `fire_in_seconds` is omited, the
+-- timer starts immediately.
+-- function lib:start(fire_in_seconds)
+
+-- Stop the timer.
+-- function lib:stop()
+
+-- Change timer interval. Use #start instead of changing interval for irregular
+-- timers as this method is more costly.
+--
+-- Interval is specified in seconds.
+-- function lib:setInterval(interval)
+
+
+-- # Callbacks
+
+-- Method called when the timer fires.
+-- function lib:timeout()
+
 return lib
-
