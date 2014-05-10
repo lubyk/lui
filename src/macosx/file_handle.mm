@@ -6,8 +6,9 @@ using namespace lui;
 
 // ============================================== LFileHandle (objC)
 
-@interface LFileHandle : NSFileHandle {
+@interface LFileHandle : NSObject {
   FileHandle * master_;
+  NSFileHandle *fh_;
   bool enabled_;
 }
 
@@ -20,16 +21,14 @@ using namespace lui;
 @implementation LFileHandle
 
 - (id)initWithFileDescriptor:(int)fd master:(FileHandle*)master {
-  printf("OK\n");
-  self = [super initWithFileDescriptor:fd];
-  printf("GOOD\n");
+  fh_ = [[NSFileHandle alloc] initWithFileDescriptor:fd];
   if (self) {
     master_  = master;
     enabled_ = true;
-    [self waitForDataInBackgroundAndNotify];
+    [fh_ waitForDataInBackgroundAndNotify];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(activated:)
-                                                 name:NSFileHandleDataAvailableNotification object:self];
+                                                 name:NSFileHandleDataAvailableNotification object:fh_];
   }
   return self;
 }
@@ -42,6 +41,11 @@ using namespace lui;
 
 - (void)setEnabled:(bool)enable {
   enabled_ = enable;
+}
+
+- (void)dealloc {
+  [super dealloc];
+  [fh_ release];
 }
 
 @end
@@ -70,7 +74,7 @@ public:
   }
 
   LuaStackSize __tostring(lua_State *L) {
-    lua_pushfstring(L, "lui.FileHandle %f: %p", fd_, master_);
+    lua_pushfstring(L, "lui.FileHandle %d: %p", fd_, master_);
     return 1;
   }
 };

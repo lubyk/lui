@@ -33,7 +33,6 @@ local new = lib.new
 -- The callback can be passed in the constructor or set as `activated` function.
 function lib.new(fd, callback)
   local self = new(fd)
-  print(self)
   if callback then
     self.activated = callback
   end
