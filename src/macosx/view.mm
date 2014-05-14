@@ -413,8 +413,12 @@ public:
                                              master:master_
                                                view:view_];
       }
-      [win_ makeKeyAndOrderFront:NSApp];
+      [win_ makeKeyAndOrderFront:win_];
       [win_ setReleasedWhenClosed:NO];
+      // [NSApp activateIgnoringOtherApps:YES];
+
+      // Forces OpenGL context initialization.
+      [view_ setNeedsDisplay:YES];
     }
   }
 

@@ -55,6 +55,8 @@ public:
 
   void stop();
 
+  bool running();
+
   /** Expects an interval in seconds. Use start(interval) for irregular
    * timers instead.
    */
@@ -65,10 +67,20 @@ public:
 
   // =================================== CALLBACKS
 
-  void timeout() {
-    if (!dub_pushcallback("timeout")) return;
+  double timeout() {
+    double retval = -1.0;
+
+    if (!dub_pushcallback("timeout")) return retval;
     // <func> <self>
-    dub_call(1, 0);
+    dub_call(1, 1);
+    // <nb>
+    if (lua_isnumber(dub_L, -1)) {
+      retval = lua_tonumber(dub_L, -1);
+    }
+    // <nb>
+    lua_pop(dub_L, 1);
+    //
+    return retval;
   }
 
 private:

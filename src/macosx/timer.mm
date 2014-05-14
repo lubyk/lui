@@ -38,7 +38,10 @@ using namespace lui;
 }
 
 - (void)timerFireMethod:(NSTimer*)theTimer {
-  master_->timeout();
+  double next_interval = master_->timeout();
+  if (next_interval >= 0) {
+    [self setFireDate:[[NSDate date] dateByAddingTimeInterval:next_interval]];
+  }
 }
 
 - (void)setFireDate:(NSDate*)date {
@@ -99,6 +102,10 @@ public:
     }
   }
 
+  bool running() {
+    return timer_ != nil;
+  }
+
   /** Expects an interval in seconds.
    */
   void setInterval(double interval) {
@@ -135,6 +142,10 @@ void Timer::start() {
 
 void Timer::stop() {
   impl_->stop();
+}
+
+bool Timer::running() {
+  return impl_->running();
 }
 
 /** Expects an interval in seconds.

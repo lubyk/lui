@@ -38,6 +38,7 @@ function lib.new()
       -- Replace poller with lui GUI poller
       -- local poller = lui.Poller()
       -- coroutine.yield('poller', poller)
+      coroutine.yield('gui')
     end
   end
   return app
@@ -46,8 +47,8 @@ end
 -- # Runtime
 
 -- Enter the OS graphical interface event loop. This is implicitely called by
--- lub.Scheduler.run when an lui.Application has been created (either explicitely or
--- implicitely by creating an lui.Window ).
+-- lens.Scheduler when an lui.Application is created while the scheduler is
+-- running (either explicitely or implicitely by creating an lui.Window).
 -- function lib:exec()
 
 return lib

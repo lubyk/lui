@@ -87,8 +87,24 @@ static int Timer_stop(lua_State *L) {
   return dub::error(L);
 }
 
+/** bool lui::Timer::running()
+ * include/lui/Timer.h:58
+ */
+static int Timer_running(lua_State *L) {
+  try {
+    Timer *self = *((Timer **)dub::checksdata(L, 1, "lui.Timer"));
+    lua_pushboolean(L, self->running());
+    return 1;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "running: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "running: Unknown exception");
+  }
+  return dub::error(L);
+}
+
 /** void lui::Timer::setInterval(double interval)
- * include/lui/Timer.h:61
+ * include/lui/Timer.h:63
  */
 static int Timer_setInterval(lua_State *L) {
   try {
@@ -105,7 +121,7 @@ static int Timer_setInterval(lua_State *L) {
 }
 
 /** LuaStackSize lui::Timer::__tostring(lua_State *L)
- * include/lui/Timer.h:63
+ * include/lui/Timer.h:65
  */
 static int Timer___tostring(lua_State *L) {
   try {
@@ -128,6 +144,7 @@ static const struct luaL_Reg Timer_member_methods[] = {
   { "__gc"         , Timer__Timer         },
   { "start"        , Timer_start          },
   { "stop"         , Timer_stop           },
+  { "running"      , Timer_running        },
   { "setInterval"  , Timer_setInterval    },
   { "__tostring"   , Timer___tostring     },
   { "deleted"      , dub::isDeleted       },

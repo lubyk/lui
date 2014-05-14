@@ -57,7 +57,10 @@ end
 
 -- # Callbacks
 
--- Method called when the timer fires.
+-- Method called when the timer fires. If you return a number from this
+-- method, it will be used as the next interval but it does not alter the
+-- regular timeout. Returning a number can be used for irregular timers or to
+-- change phase.
 -- function lib:timeout()
 
 return lib

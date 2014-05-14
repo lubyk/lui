@@ -22,14 +22,12 @@ using namespace lui;
 
 - (id)initWithFileDescriptor:(int)fd master:(FileHandle*)master {
   fh_ = [[NSFileHandle alloc] initWithFileDescriptor:fd];
-  if (self) {
-    master_  = master;
-    enabled_ = true;
-    [fh_ waitForDataInBackgroundAndNotify];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(activated:)
-                                                 name:NSFileHandleDataAvailableNotification object:fh_];
-  }
+  master_  = master;
+  enabled_ = true;
+  [fh_ waitForDataInBackgroundAndNotify];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(activated:)
+                                               name:NSFileHandleDataAvailableNotification object:fh_];
   return self;
 }
 
