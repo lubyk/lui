@@ -54,7 +54,7 @@ public:
 
   /** Start event loop.
    */
-  int exec();
+  int run();
 private:
   class Implementation;
   Implementation *impl_;

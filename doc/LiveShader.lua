@@ -7,14 +7,14 @@
   showing how to connect all the pieces together from window declaration and
   callbacks to timers, geometry and effects.
 
-  ![effect screenshot](img/four_simple.png)
+  ![effect screenshot](example/lui/LiveShader.jpg)
 
   Note that you must run this example with `luajit` since plain lua is not
   supported by four.
 
   ## Download source
 
-  [LiveShaderCoding.lua](examples/lui/LiveShaderCoding.lua)
+  [LiveShaderCoding.lua](example/lui/LiveShader.lua)
 
 --]]------------------------------------------------------
 -- doc:lit
@@ -238,5 +238,12 @@ end
 if not timer:running() then
   timer:start(1)
 end
+
+
+--[[
+  ## Download source
+
+  [LiveShaderCoding.lua](example/lui/LiveShader.lua)
+--]]
 
 -- lens.halt()

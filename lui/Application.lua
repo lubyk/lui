@@ -5,19 +5,31 @@
   GUI main application.
 
   The class is mainly used to pass scheduling to the OS event loop. It is
-  automatically created by the lui library and works along with lub.Scheduler.
+  automatically created by the lui library and works along with lens.Scheduler.
   
   Usage example:
   
-    local lub = require 'lub'
-    local lui = require 'lui'
+    local lens = require 'lens'
+    local lui  = require 'lui'
 
-    -- Implicit creation of lui.Application
+    lens.run(function()
+      -- Implicit creation of lui.Application and GUI event loop integration
+      -- with scheduler.
+      win = lui.Window()
+      -- Now running in OS GUI loop.
+      win:show()
+    end)
+
+  ## Standalone
+
+  You can also use the application without lens library:
+  
+    local lui  = require 'lui'
+
     win = lui.Window()
 
-    -- Implicit call to lui.Application.exec
-    lub.run()
-
+    -- Start OS GUI loop
+    lui.Application():run()
 
 --]]------------------------------------------------------
 local lub  = require 'lub'
@@ -49,6 +61,6 @@ end
 -- Enter the OS graphical interface event loop. This is implicitely called by
 -- lens.Scheduler when an lui.Application is created while the scheduler is
 -- running (either explicitely or implicitely by creating an lui.Window).
--- function lib:exec()
+-- function lib:run()
 
 return lib

@@ -3,6 +3,7 @@ tmp/window/window.app/Contents/MacOS/window
 tmp/glwindow/glwindow.app/Contents/MacOS/glwindow
 *.swp
 *.swo
+*.o
 *~
 lui/core.so
 /html

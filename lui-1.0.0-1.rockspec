@@ -23,17 +23,14 @@ build = {
     -- Plain Lua files
     ['lui'            ] = 'lui/init.lua',
     ['lui.Application'] = 'lui/Application.lua',
-    ['lui.Poller'     ] = 'lui/Poller.lua',
     ['lui.Timer'      ] = 'lui/Timer.lua',
     ['lui.View'       ] = 'lui/View.lua',
     -- C module
     ['lui.core'       ] = {
       sources = {
         'src/bind/dub/dub.cpp',
-        'src/bind/dub/dub.cpp~',
         'src/bind/lui_Application.cpp',
         'src/bind/lui_core.cpp',
-        'src/bind/lui_FileHandle.cpp',
         'src/bind/lui_Timer.cpp',
         'src/bind/lui_View.cpp',
       },
@@ -41,6 +38,26 @@ build = {
       libraries = {'stdc++'},
     },
   },
+  platforms = {
+    linux = {
+      modules = {
+        ['lui.core'] = {
+          libraries = {'stdc++', 'rt'},
+        },
+      },
+    },
+    macosx = {
+      modules = {
+        ['lui.core'] = {
+          sources = {
+            [6] = 'src/macosx/application.mm',
+            [7] = 'src/macosx/timer.mm',
+            [8] = 'src/macosx/view.mm',
+          },
+          libraries = {'stdc++', '-framework Foundation', '-framework Cocoa', 'objc'},
+        },
+      },
+    },
+  },
 }
-
 

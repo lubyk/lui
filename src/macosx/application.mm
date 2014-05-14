@@ -20,7 +20,7 @@ public:
     [pool_ release];
   }
 
-  int exec() {
+  int run() {
     [NSApp run];
     return 0;
   }
@@ -42,6 +42,6 @@ void Application::bringToFront() {
   [NSApp activateIgnoringOtherApps:YES];
 }
 
-int Application::exec() {
-  return impl_->exec();
+int Application::run() {
+  return impl_->run();
 }

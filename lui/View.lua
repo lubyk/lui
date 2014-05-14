@@ -11,6 +11,8 @@
 
     win = lui.View()
 
+  See [LiveShader](tut.lui.LiveShader.html) tutorial.
+
   ## Coordinate system
 
   All coordinates use bottom-left as zero, Y axis pointing up:

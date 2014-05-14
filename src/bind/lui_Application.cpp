@@ -63,18 +63,18 @@ static int Application_bringToFront(lua_State *L) {
   return dub::error(L);
 }
 
-/** int lui::Application::exec()
+/** int lui::Application::run()
  * include/lui/Application.h:57
  */
-static int Application_exec(lua_State *L) {
+static int Application_run(lua_State *L) {
   try {
     Application *self = *((Application **)dub::checksdata(L, 1, "lui.Application"));
-    lua_pushnumber(L, self->exec());
+    lua_pushnumber(L, self->run());
     return 1;
   } catch (std::exception &e) {
-    lua_pushfstring(L, "exec: %s", e.what());
+    lua_pushfstring(L, "run: %s", e.what());
   } catch (...) {
-    lua_pushfstring(L, "exec: Unknown exception");
+    lua_pushfstring(L, "run: Unknown exception");
   }
   return dub::error(L);
 }
@@ -95,7 +95,7 @@ static const struct luaL_Reg Application_member_methods[] = {
   { "new"          , Application_Application },
   { "__gc"         , Application__Application },
   { "bringToFront" , Application_bringToFront },
-  { "exec"         , Application_exec     },
+  { "run"          , Application_run      },
   { "__tostring"   , Application___tostring },
   { "deleted"      , dub::isDeleted       },
   { NULL, NULL},

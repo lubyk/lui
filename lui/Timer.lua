@@ -2,7 +2,9 @@
 
   # Timer
 
-  GUI view with an OpenGL 3 context.
+  Native OS timer. This can be used if you do not want to use
+  (lens)[http://doc.lubyk.org/lens.html] library and need a simple timer. Timer
+  phase and drift depends on OS. Use lens.Timer when possible instead.
 
   Usage example:
   
