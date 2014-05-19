@@ -47,9 +47,7 @@ function lib.new()
   if not app then
     app = new()
     if coroutine.running() then
-      -- Replace poller with lui GUI poller
-      -- local poller = lui.Poller()
-      -- coroutine.yield('poller', poller)
+      -- Inform poller that we need to run GUI event loop.
       coroutine.yield('gui')
     end
   end

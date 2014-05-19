@@ -44,6 +44,10 @@ class View : public dub::Thread {
    */
   bool animate_frame_;
 
+  /** Just for a test with four, remove when done.
+   */
+  unsigned char *debug_buffer_;
+  size_t debug_buffer_sz_;
 public:
 
   enum WindowStyles {
@@ -101,6 +105,19 @@ public:
   void simulateClick(double x, double y, int op = View::MouseDown, int btn = View::LeftButton, int mod = 0);
 
   void swapBuffers();
+
+  LuaStackSize debugTest(int val, lua_State *L) {
+    for(int i = 0; i < 64; ++i) {
+      for(int j = 0; j < 64; ++j) {
+        debug_buffer_[i*64*4 + j*4    ] = (i+j)*2;
+        debug_buffer_[i*64*4 + j*4 + 1] = (i+j)*2;
+        debug_buffer_[i*64*4 + j*4 + 2] = (i+j)*2;
+        debug_buffer_[i*64*4 + j*4 + 3] = 255;
+      }
+    }
+    lua_pushlightuserdata(L, debug_buffer_);
+    return 1;
+  }
 
   // =================================== CALLBACKS
 

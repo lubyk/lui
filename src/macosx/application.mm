@@ -5,19 +5,21 @@
 using namespace lui;
 
 class Application::Implementation {
-  Application *master_;
+//  Application *master_;
   NSAutoreleasePool* pool_;
 
 public:
-  Implementation(Application *master)
-   : master_(master)
+  Implementation()
+    //Application *master)
+    //: master_(master)
   {
     pool_ = [[NSAutoreleasePool alloc] init];
     [NSApplication sharedApplication];
   }
 
   ~Implementation() {
-    [pool_ release];
+    // FIXME: releasing the pool crashes. Why ?
+    // [pool_ release];
   }
 
   int run() {
@@ -31,7 +33,7 @@ Application::Application() {
 
   // Avoid nasty number parsing bugs (0.5 not parsed)
   // setlocale(LC_NUMERIC, "C");
-  impl_ = new Application::Implementation(this);
+  impl_ = new Application::Implementation(); //this);
 }
 
 Application::~Application() {

@@ -190,9 +190,9 @@ public:
   }
 
   ~Implementation() {
-    [view_ autorelease];
+    [view_ release];
     if (win_) {
-      [win_ autorelease];
+      [win_ release];
     }
   }
 
@@ -436,12 +436,16 @@ public:
 };
 
 View::View(int style) 
-  : animate_frame_(true) {
+  : animate_frame_(true)
+  , debug_buffer_(NULL) {
   impl_ = new View::Implementation(this, style);
+  debug_buffer_sz_ = 64 * 64 * 4; // RGBA
+  debug_buffer_ = (unsigned char*)malloc(debug_buffer_sz_ * sizeof(unsigned char));
 }
 
 View::~View() {
   if (impl_) delete impl_;
+  if (debug_buffer_) free(debug_buffer_);
 }
 
 void View::setFrame(double x, double y, double w, double h) {

@@ -97,7 +97,7 @@ public:
   void stop() {
     if (timer_) {
       [timer_ invalidate];
-      [timer_ autorelease];
+      [timer_ release];
       timer_ = nil;
     }
   }
