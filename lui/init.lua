@@ -19,7 +19,34 @@ lib.DEPENDS = { -- doc
   -- Compatible with Lua 5.1, 5.2 and LuaJIT
   "lua >= 5.1, < 5.3",
   -- Uses [Lubyk base library](http://doc.lubyk.org/lub.html)
-  'lub >= 1.0.3, < 1.1',
+  'lub >= 1.0.3, < 2',
+}
+
+-- nodoc
+lib.DESCRIPTION = {
+  summary = "Lubyk GUI module.",
+  detailed = [[
+    A pure OpenGL based GUI.
+  ]],
+  homepage = "http://doc.lubyk.org/lui.html",
+  author   = "Gaspard Bucher",
+  license  = "MIT",
+}
+
+-- nodoc
+lib.BUILD = {
+  github    = 'lubyk',
+  includes  = {'include', 'src/bind'},
+  libraries = {'stdc++'},
+  platlibs = {
+    linux   = {'stdc++', 'rt'},
+    macosx  = {
+      'stdc++',
+      '-framework Foundation',
+      '-framework Cocoa',
+      'objc',
+    },
+  },
 }
 
 -- nodoc
